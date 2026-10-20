@@ -158,10 +158,9 @@ This replication package preserves exact mathematical definitions:
 If you use or adapt this code or benchmark, please cite the corresponding research paper:
 
 ```bibtex
-@article{beyond_accuracy_temporal_reliability_2026,
-  title={Beyond Accuracy: Temporal Reliability and Robustness of NLP and LLM Classifiers},
-  author={[Author Names Withheld for Review / As Listed on Manuscript]},
-  journal={[Journal / Conference Submission]},
-  year={2026}
+@article{alkhalifa7560344beyond,
+  title={Beyond Accuracy in Dynamic Sentiment Analysis: Reliability Profiling and Temporal Forensics for Frozen and Adapted Models},
+  author={Alkhalifa, Rabab},
+  journal={Available at SSRN 7560344}
 }
 ```
