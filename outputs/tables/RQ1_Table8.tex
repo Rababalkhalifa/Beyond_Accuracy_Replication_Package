@@ -1,0 +1,26 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Canonical within-period performance across datasets and model families. Values are means across five sampling seeds. Climate is stance classification and Yelp is sentiment classification. ECE uses predicted probabilities for supervised models and self-reported confidence for prompted LLMs. Latency is the recorded mean per evaluation example; timing procedures differ between model families.}
+\label{tab:canonical-performance}
+\begin{tabular}{llrrrr}
+\toprule
+\textbf{Dataset setting} & \textbf{Model} & \textbf{Accuracy} & \textbf{Macro-F1} & \textbf{ECE} & \textbf{Mean latency (s)} \\
+\midrule
+\textbf{Climate n500} & DistilBERT & 0.8878 & 0.8876 & 0.0994 & 0.001422 \\
+ & TF--IDF+LR & 0.8018 & 0.8001 & 0.0264 & 0.000036 \\
+ & \texttt{phi} & 0.7126 & 0.7124 & 0.2233 & 1.886351 \\
+ & \texttt{qwen} & 0.6520 & 0.6263 & 0.2841 & 0.627379 \\
+\midrule
+\textbf{Yelp n500} & DistilBERT & 0.9324 & 0.9324 & 0.0559 & 0.002246 \\
+ & TF--IDF+LR & 0.9046 & 0.9045 & 0.1581 & 0.000124 \\
+ & \texttt{phi} & 0.9452 & 0.9452 & 0.0360 & 10.688317 \\
+ & \texttt{qwen} & 0.9602 & 0.9602 & 0.0654 & 3.710427 \\
+\midrule
+\textbf{Yelp n1000} & DistilBERT & 0.9348 & 0.9348 & 0.0536 & 0.002204 \\
+ & TF--IDF+LR & 0.9063 & 0.9063 & 0.1597 & 0.000118 \\
+ & \texttt{phi} & 0.9448 & 0.9448 & 0.0340 & 10.861398 \\
+ & \texttt{qwen} & 0.9601 & 0.9601 & 0.0646 & 3.663848 \\
+\bottomrule
+\end{tabular}
+\end{table*}

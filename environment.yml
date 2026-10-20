@@ -1,0 +1,16 @@
+name: beyond-accuracy
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy>=1.20.0
+  - scipy>=1.7.0
+  - pandas>=1.3.0
+  - matplotlib>=3.5.0
+  - pyyaml>=6.0
+  - jupyter
+  - ipython
+  - pip
+  - pip:
+      - pytest>=7.0.0

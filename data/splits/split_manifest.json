@@ -1,0 +1,1458 @@
+{
+  "schema_version": "4.0",
+  "created_at_utc": "2026-08-04T22:06:08.213399+00:00",
+  "purpose": "paper-compatible temporal reliability rerun",
+  "config_path": "C:\\Users\\ccsit\\Downloads\\TempMultiAgent\\temporal_reliability_rerun_v8\\datasets.json",
+  "split_root": "C:\\Users\\ccsit\\Downloads\\TempMultiAgent\\temporal_reliability_rerun_v8\\shared_splits_paper_v6_joint_quota",
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "historical_pool_total": 10000,
+  "train_rows": 7000,
+  "validation_rows": 3000,
+  "rules": {
+    "external_evaluation_used_for_training": false,
+    "external_evaluation_used_for_model_selection": false,
+    "same_saved_evaluation_rows_for_all_models": true,
+    "diversity_order_uses_text_and_year_only": true,
+    "labels_used_only_after_ordering_for_fixed_class_quotas": true,
+    "fully_label_blind_prefix_logged_for_bias_audit": true,
+    "yelp_n500_nested_in_n1000": true,
+    "exact_train_eval_text_overlap_removed_before_sampling": true,
+    "evaluation_overlap_policy": "earliest",
+    "evaluation_periods_mutually_disjoint_when_policy_is_earliest": true,
+    "checksums_required_before_model_execution": true
+  },
+  "datasets": {
+    "climate": {
+      "task_type": "climate_stance",
+      "labels": [
+        "BELIEVER",
+        "DENIER"
+      ],
+      "periods": {
+        "historical_train": "2007_2009",
+        "within": "2010",
+        "short": "2013",
+        "long": "2018_2019"
+      },
+      "evaluation_sizes_per_label": [
+        500
+      ],
+      "evaluation_overlap_policy": "earliest",
+      "raw_evaluation_source_overlap": {
+        "within__short": 44,
+        "within__long": 6,
+        "short__long": 9
+      },
+      "evaluation_source_rows_removed": {
+        "within": {
+          "total": 0,
+          "by_label": {
+            "BELIEVER": 0,
+            "DENIER": 0
+          },
+          "remaining_by_label": {
+            "BELIEVER": 40695,
+            "DENIER": 41430
+          }
+        },
+        "short": {
+          "total": 44,
+          "by_label": {
+            "BELIEVER": 8,
+            "DENIER": 36
+          },
+          "remaining_by_label": {
+            "BELIEVER": 42587,
+            "DENIER": 42846
+          }
+        },
+        "long": {
+          "total": 10,
+          "by_label": {
+            "BELIEVER": 2,
+            "DENIER": 8
+          },
+          "remaining_by_label": {
+            "BELIEVER": 30507,
+            "DENIER": 30006
+          }
+        }
+      },
+      "historical_unique_rows_before_decontamination": 83541,
+      "historical_rows_removed_for_train_eval_overlap": 89,
+      "historical_unique_rows_after_decontamination": 83452,
+      "sampling_design": {
+        "primary": "fixed year-by-class quotas applied after a text-and-year-only seed-specific diversity order",
+        "ordering_uses_labels": false,
+        "labels_used_only_for_predeclared_year_by_class_quotas": true,
+        "year_totals_derived_without_labels": true,
+        "within_year_class_quota": "as even as integer arithmetic permits",
+        "text_features": "word 1-2 gram TF-IDF + character 3-5 gram TF-IDF",
+        "coverage": "seed-specific central representatives within year-cluster cells, then proportional weighted fair year merge",
+        "year_weighting": "proportional"
+      },
+      "seeds": {
+        "42": {
+          "train": "climate\\seed_42\\train_7000.csv",
+          "validation": "climate\\seed_42\\validation_3000.csv",
+          "historical_diversity_order": {
+            "rows": 83452,
+            "target_total": 10000,
+            "years": [
+              "2007",
+              "2008",
+              "2009"
+            ],
+            "n_years": 3,
+            "n_clusters": 512,
+            "n_year_cluster_cells": 1033,
+            "word_max_features": 12000,
+            "char_max_features": 12000,
+            "svd_components": 64,
+            "structure_sha256": "4abae546b4260220039695f773f5e3b8c1f5e0ffef2d1252e273dca9f2cb01d2",
+            "method": "text_year_tfidf_svd_minibatch_kmeans",
+            "labels_used_in_structure": false,
+            "label_blind_order_sha256": "1972d2de329982b682865b2d1bdf3c60a33ccdaef9a044a01350efb764dd5f53",
+            "year_weighting": "proportional",
+            "target_year_weights": {
+              "2007": 0.005512150697406892,
+              "2008": 0.05206585821789771,
+              "2009": 0.9424219910846954
+            },
+            "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+            "labels_used_in_ordering": false,
+            "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+          },
+          "evaluation": {
+            "within": {
+              "diversity_order": {
+                "rows": 82125,
+                "target_total": 1000,
+                "years": [
+                  "2010"
+                ],
+                "n_years": 1,
+                "n_clusters": 287,
+                "n_year_cluster_cells": 287,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "d1e53f509152f4cff1ba0b9ed2247ecd09c746d40117f52c170834a10b802907",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "3fef0d6b8f381eeeada3ccdaa9d2a3a4aa03382d9dcd636bda643e55f395ef51",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2010": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_42\\within_2010_n500_per_label_total1000.csv"
+              }
+            },
+            "short": {
+              "diversity_order": {
+                "rows": 85433,
+                "target_total": 1000,
+                "years": [
+                  "2013"
+                ],
+                "n_years": 1,
+                "n_clusters": 292,
+                "n_year_cluster_cells": 292,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "fc6d289a06e84087108cfe0db56adcf275c7300b357a0d6eb65cf6de2500bbd4",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "5d52c1f6498f2b0a3668444a9f33d31276337fbf08a2b8e9fa511841e6fc4d36",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2013": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_42\\short_2013_n500_per_label_total1000.csv"
+              }
+            },
+            "long": {
+              "diversity_order": {
+                "rows": 60513,
+                "target_total": 1000,
+                "years": [
+                  "2018",
+                  "2019"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 496,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "6d5485af06a0042d880135064aac10ac22facc121bf5846bece9f7a574abc68a",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "6b97b5b6b4032c56cfff5fd8e38701c3f87b4bc66029777da0600fe064440084",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2018": 0.7483020177482524,
+                  "2019": 0.25169798225174755
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_42\\long_2018_2019_n500_per_label_total1000.csv"
+              }
+            }
+          }
+        },
+        "43": {
+          "train": "climate\\seed_43\\train_7000.csv",
+          "validation": "climate\\seed_43\\validation_3000.csv",
+          "historical_diversity_order": {
+            "rows": 83452,
+            "target_total": 10000,
+            "years": [
+              "2007",
+              "2008",
+              "2009"
+            ],
+            "n_years": 3,
+            "n_clusters": 512,
+            "n_year_cluster_cells": 1033,
+            "word_max_features": 12000,
+            "char_max_features": 12000,
+            "svd_components": 64,
+            "structure_sha256": "4abae546b4260220039695f773f5e3b8c1f5e0ffef2d1252e273dca9f2cb01d2",
+            "method": "text_year_tfidf_svd_minibatch_kmeans",
+            "labels_used_in_structure": false,
+            "label_blind_order_sha256": "6479b8abb3a5300da71e1ef9b542432b460df2dfaf2054faaf502b7824f7a64e",
+            "year_weighting": "proportional",
+            "target_year_weights": {
+              "2007": 0.005512150697406892,
+              "2008": 0.05206585821789771,
+              "2009": 0.9424219910846954
+            },
+            "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+            "labels_used_in_ordering": false,
+            "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+          },
+          "evaluation": {
+            "within": {
+              "diversity_order": {
+                "rows": 82125,
+                "target_total": 1000,
+                "years": [
+                  "2010"
+                ],
+                "n_years": 1,
+                "n_clusters": 287,
+                "n_year_cluster_cells": 287,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "d1e53f509152f4cff1ba0b9ed2247ecd09c746d40117f52c170834a10b802907",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "cb7c782a2e052a07b041b4ad9e6110c00a24d86a121b48d1d072db3acdb84e3e",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2010": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_43\\within_2010_n500_per_label_total1000.csv"
+              }
+            },
+            "short": {
+              "diversity_order": {
+                "rows": 85433,
+                "target_total": 1000,
+                "years": [
+                  "2013"
+                ],
+                "n_years": 1,
+                "n_clusters": 292,
+                "n_year_cluster_cells": 292,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "fc6d289a06e84087108cfe0db56adcf275c7300b357a0d6eb65cf6de2500bbd4",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "0a912de0a186353cb65be122cb80ef130649de1cdd925aaf16e7ef911357caab",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2013": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_43\\short_2013_n500_per_label_total1000.csv"
+              }
+            },
+            "long": {
+              "diversity_order": {
+                "rows": 60513,
+                "target_total": 1000,
+                "years": [
+                  "2018",
+                  "2019"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 496,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "6d5485af06a0042d880135064aac10ac22facc121bf5846bece9f7a574abc68a",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "3493487c22f7067e33e27a07a1c3181b84951c451c940096d56f5dcc4036723a",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2018": 0.7483020177482524,
+                  "2019": 0.25169798225174755
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_43\\long_2018_2019_n500_per_label_total1000.csv"
+              }
+            }
+          }
+        },
+        "44": {
+          "train": "climate\\seed_44\\train_7000.csv",
+          "validation": "climate\\seed_44\\validation_3000.csv",
+          "historical_diversity_order": {
+            "rows": 83452,
+            "target_total": 10000,
+            "years": [
+              "2007",
+              "2008",
+              "2009"
+            ],
+            "n_years": 3,
+            "n_clusters": 512,
+            "n_year_cluster_cells": 1033,
+            "word_max_features": 12000,
+            "char_max_features": 12000,
+            "svd_components": 64,
+            "structure_sha256": "4abae546b4260220039695f773f5e3b8c1f5e0ffef2d1252e273dca9f2cb01d2",
+            "method": "text_year_tfidf_svd_minibatch_kmeans",
+            "labels_used_in_structure": false,
+            "label_blind_order_sha256": "37684deb9b2a183433e8209172172e871b2cb376ffb1d0f843b8ad178265be39",
+            "year_weighting": "proportional",
+            "target_year_weights": {
+              "2007": 0.005512150697406892,
+              "2008": 0.05206585821789771,
+              "2009": 0.9424219910846954
+            },
+            "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+            "labels_used_in_ordering": false,
+            "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+          },
+          "evaluation": {
+            "within": {
+              "diversity_order": {
+                "rows": 82125,
+                "target_total": 1000,
+                "years": [
+                  "2010"
+                ],
+                "n_years": 1,
+                "n_clusters": 287,
+                "n_year_cluster_cells": 287,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "d1e53f509152f4cff1ba0b9ed2247ecd09c746d40117f52c170834a10b802907",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "86e4fb541662f15eab67ebbc239d748ad5b1457a204302f0e12db34859333a97",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2010": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_44\\within_2010_n500_per_label_total1000.csv"
+              }
+            },
+            "short": {
+              "diversity_order": {
+                "rows": 85433,
+                "target_total": 1000,
+                "years": [
+                  "2013"
+                ],
+                "n_years": 1,
+                "n_clusters": 292,
+                "n_year_cluster_cells": 292,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "fc6d289a06e84087108cfe0db56adcf275c7300b357a0d6eb65cf6de2500bbd4",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "b8def4036f670a0c2c422ec7b0ca401ff57c504f771eae96689640eb46f90837",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2013": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_44\\short_2013_n500_per_label_total1000.csv"
+              }
+            },
+            "long": {
+              "diversity_order": {
+                "rows": 60513,
+                "target_total": 1000,
+                "years": [
+                  "2018",
+                  "2019"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 496,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "6d5485af06a0042d880135064aac10ac22facc121bf5846bece9f7a574abc68a",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "0bb555ee88a1bcd68535eb71a60c33c9cb64c67ff3130fbcd43c2f43960f6f89",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2018": 0.7483020177482524,
+                  "2019": 0.25169798225174755
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_44\\long_2018_2019_n500_per_label_total1000.csv"
+              }
+            }
+          }
+        },
+        "45": {
+          "train": "climate\\seed_45\\train_7000.csv",
+          "validation": "climate\\seed_45\\validation_3000.csv",
+          "historical_diversity_order": {
+            "rows": 83452,
+            "target_total": 10000,
+            "years": [
+              "2007",
+              "2008",
+              "2009"
+            ],
+            "n_years": 3,
+            "n_clusters": 512,
+            "n_year_cluster_cells": 1033,
+            "word_max_features": 12000,
+            "char_max_features": 12000,
+            "svd_components": 64,
+            "structure_sha256": "4abae546b4260220039695f773f5e3b8c1f5e0ffef2d1252e273dca9f2cb01d2",
+            "method": "text_year_tfidf_svd_minibatch_kmeans",
+            "labels_used_in_structure": false,
+            "label_blind_order_sha256": "f1777cdf958f1ac2abca6bec2de477bdf67a6d4d7c59e3bca10e86d5884ca892",
+            "year_weighting": "proportional",
+            "target_year_weights": {
+              "2007": 0.005512150697406892,
+              "2008": 0.05206585821789771,
+              "2009": 0.9424219910846954
+            },
+            "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+            "labels_used_in_ordering": false,
+            "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+          },
+          "evaluation": {
+            "within": {
+              "diversity_order": {
+                "rows": 82125,
+                "target_total": 1000,
+                "years": [
+                  "2010"
+                ],
+                "n_years": 1,
+                "n_clusters": 287,
+                "n_year_cluster_cells": 287,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "d1e53f509152f4cff1ba0b9ed2247ecd09c746d40117f52c170834a10b802907",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "0b0fdb4fe72c646e0f62fd6ee4e738df79b6217c11c8b95264529e3841bc2ec3",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2010": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_45\\within_2010_n500_per_label_total1000.csv"
+              }
+            },
+            "short": {
+              "diversity_order": {
+                "rows": 85433,
+                "target_total": 1000,
+                "years": [
+                  "2013"
+                ],
+                "n_years": 1,
+                "n_clusters": 292,
+                "n_year_cluster_cells": 292,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "fc6d289a06e84087108cfe0db56adcf275c7300b357a0d6eb65cf6de2500bbd4",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "1a87bfa90e167632b91146bf1ef074f74c1b98b4cb85929645b962308cf23daa",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2013": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_45\\short_2013_n500_per_label_total1000.csv"
+              }
+            },
+            "long": {
+              "diversity_order": {
+                "rows": 60513,
+                "target_total": 1000,
+                "years": [
+                  "2018",
+                  "2019"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 496,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "6d5485af06a0042d880135064aac10ac22facc121bf5846bece9f7a574abc68a",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "e7651919622c28fa8482ad8f1f4cc4fda52c400f6a033105ad2bd7ecd90647c8",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2018": 0.7483020177482524,
+                  "2019": 0.25169798225174755
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_45\\long_2018_2019_n500_per_label_total1000.csv"
+              }
+            }
+          }
+        },
+        "46": {
+          "train": "climate\\seed_46\\train_7000.csv",
+          "validation": "climate\\seed_46\\validation_3000.csv",
+          "historical_diversity_order": {
+            "rows": 83452,
+            "target_total": 10000,
+            "years": [
+              "2007",
+              "2008",
+              "2009"
+            ],
+            "n_years": 3,
+            "n_clusters": 512,
+            "n_year_cluster_cells": 1033,
+            "word_max_features": 12000,
+            "char_max_features": 12000,
+            "svd_components": 64,
+            "structure_sha256": "4abae546b4260220039695f773f5e3b8c1f5e0ffef2d1252e273dca9f2cb01d2",
+            "method": "text_year_tfidf_svd_minibatch_kmeans",
+            "labels_used_in_structure": false,
+            "label_blind_order_sha256": "5dfd2237ea1bff752c7ab88246cc0c5f70f8bfefc19d54cb7dc45492f043b6fc",
+            "year_weighting": "proportional",
+            "target_year_weights": {
+              "2007": 0.005512150697406892,
+              "2008": 0.05206585821789771,
+              "2009": 0.9424219910846954
+            },
+            "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+            "labels_used_in_ordering": false,
+            "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+          },
+          "evaluation": {
+            "within": {
+              "diversity_order": {
+                "rows": 82125,
+                "target_total": 1000,
+                "years": [
+                  "2010"
+                ],
+                "n_years": 1,
+                "n_clusters": 287,
+                "n_year_cluster_cells": 287,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "d1e53f509152f4cff1ba0b9ed2247ecd09c746d40117f52c170834a10b802907",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "d795bfe9556cf35d525985b24263ab9b43acf257aed3401db353340200513fe0",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2010": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_46\\within_2010_n500_per_label_total1000.csv"
+              }
+            },
+            "short": {
+              "diversity_order": {
+                "rows": 85433,
+                "target_total": 1000,
+                "years": [
+                  "2013"
+                ],
+                "n_years": 1,
+                "n_clusters": 292,
+                "n_year_cluster_cells": 292,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "fc6d289a06e84087108cfe0db56adcf275c7300b357a0d6eb65cf6de2500bbd4",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "638e28f73b5f66b01893c1f576f2597d97fccef3ac8368793ecbb386155da260",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2013": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_46\\short_2013_n500_per_label_total1000.csv"
+              }
+            },
+            "long": {
+              "diversity_order": {
+                "rows": 60513,
+                "target_total": 1000,
+                "years": [
+                  "2018",
+                  "2019"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 496,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "6d5485af06a0042d880135064aac10ac22facc121bf5846bece9f7a574abc68a",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "73031925012c73562cb91c938b9853aaf7aceb5d8eac7dfa1ba29916cc792ec2",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2018": 0.7483020177482524,
+                  "2019": 0.25169798225174755
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "climate\\seed_46\\long_2018_2019_n500_per_label_total1000.csv"
+              }
+            }
+          }
+        }
+      }
+    },
+    "yelp": {
+      "task_type": "sentiment",
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "periods": {
+        "historical_train": "2006_2010",
+        "within": "2011_2012",
+        "short": "2015",
+        "long": "2019_2020"
+      },
+      "evaluation_sizes_per_label": [
+        500,
+        1000
+      ],
+      "evaluation_overlap_policy": "earliest",
+      "raw_evaluation_source_overlap": {
+        "within__short": 1,
+        "within__long": 0,
+        "short__long": 0
+      },
+      "evaluation_source_rows_removed": {
+        "within": {
+          "total": 0,
+          "by_label": {
+            "NEG": 0,
+            "POS": 0
+          },
+          "remaining_by_label": {
+            "NEG": 44968,
+            "POS": 44995
+          }
+        },
+        "short": {
+          "total": 1,
+          "by_label": {
+            "NEG": 1,
+            "POS": 0
+          },
+          "remaining_by_label": {
+            "NEG": 44969,
+            "POS": 44988
+          }
+        },
+        "long": {
+          "total": 0,
+          "by_label": {
+            "NEG": 0,
+            "POS": 0
+          },
+          "remaining_by_label": {
+            "NEG": 44986,
+            "POS": 44997
+          }
+        }
+      },
+      "historical_unique_rows_before_decontamination": 89950,
+      "historical_rows_removed_for_train_eval_overlap": 0,
+      "historical_unique_rows_after_decontamination": 89950,
+      "sampling_design": {
+        "primary": "fixed year-by-class quotas applied after a text-and-year-only seed-specific diversity order",
+        "ordering_uses_labels": false,
+        "labels_used_only_for_predeclared_year_by_class_quotas": true,
+        "year_totals_derived_without_labels": true,
+        "within_year_class_quota": "as even as integer arithmetic permits",
+        "text_features": "word 1-2 gram TF-IDF + character 3-5 gram TF-IDF",
+        "coverage": "seed-specific central representatives within year-cluster cells, then proportional weighted fair year merge",
+        "year_weighting": "proportional"
+      },
+      "seeds": {
+        "42": {
+          "train": "yelp\\seed_42\\train_7000.csv",
+          "validation": "yelp\\seed_42\\validation_3000.csv",
+          "historical_diversity_order": {
+            "rows": 89950,
+            "target_total": 10000,
+            "years": [
+              "2006",
+              "2007",
+              "2008",
+              "2009",
+              "2010"
+            ],
+            "n_years": 5,
+            "n_clusters": 512,
+            "n_year_cluster_cells": 2390,
+            "word_max_features": 12000,
+            "char_max_features": 12000,
+            "svd_components": 64,
+            "structure_sha256": "de0b668d504756294c501b79f47b46191c778a94383851018ed29d7e85f8cdb8",
+            "method": "text_year_tfidf_svd_minibatch_kmeans",
+            "labels_used_in_structure": false,
+            "label_blind_order_sha256": "80a3aa38493a1d38e4b1697e402e837b4aa9a947284fac7c9b873e813dd64e14",
+            "year_weighting": "proportional",
+            "target_year_weights": {
+              "2006": 0.011295163979988882,
+              "2007": 0.04953863257365203,
+              "2008": 0.15872151195108394,
+              "2009": 0.2717732073374097,
+              "2010": 0.5086714841578655
+            },
+            "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+            "labels_used_in_ordering": false,
+            "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+          },
+          "evaluation": {
+            "within": {
+              "diversity_order": {
+                "rows": 89963,
+                "target_total": 2000,
+                "years": [
+                  "2011",
+                  "2012"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 499,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "562beb31db700e556335c649b722bab90b3e830c4f140c0e8ff02d258f594f72",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "7802466737593cfab3c7b20d5c5b660f59b0911baf0fbeb2011147820282d34b",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2011": 0.43645721018641,
+                  "2012": 0.5635427898135901
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_42\\within_2011_2012_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_42\\within_2011_2012_n1000_per_label_total2000.csv"
+              }
+            },
+            "short": {
+              "diversity_order": {
+                "rows": 89957,
+                "target_total": 2000,
+                "years": [
+                  "2015"
+                ],
+                "n_years": 1,
+                "n_clusters": 300,
+                "n_year_cluster_cells": 300,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "23e626f0314bef6b4086f0c786fe1120c15bd93e65a7027fc49d460028dda2dc",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "bb279d1b6681415ef7ebf9160f304f4e7dcd8470faef057dbe8249b4092b3449",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2015": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_42\\short_2015_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_42\\short_2015_n1000_per_label_total2000.csv"
+              }
+            },
+            "long": {
+              "diversity_order": {
+                "rows": 89983,
+                "target_total": 2000,
+                "years": [
+                  "2019",
+                  "2020"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 500,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "bc8f1b39c973026a6ab65b66ff7648d8dd9f169cd2ffcf75572da9230d529098",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "5260469772d94c7731034f8527337efd8bbd9c678a96c4e75b2503daaf1c7870",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2019": 0.6115599613260283,
+                  "2020": 0.38844003867397175
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_42\\long_2019_2020_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_42\\long_2019_2020_n1000_per_label_total2000.csv"
+              }
+            }
+          }
+        },
+        "43": {
+          "train": "yelp\\seed_43\\train_7000.csv",
+          "validation": "yelp\\seed_43\\validation_3000.csv",
+          "historical_diversity_order": {
+            "rows": 89950,
+            "target_total": 10000,
+            "years": [
+              "2006",
+              "2007",
+              "2008",
+              "2009",
+              "2010"
+            ],
+            "n_years": 5,
+            "n_clusters": 512,
+            "n_year_cluster_cells": 2390,
+            "word_max_features": 12000,
+            "char_max_features": 12000,
+            "svd_components": 64,
+            "structure_sha256": "de0b668d504756294c501b79f47b46191c778a94383851018ed29d7e85f8cdb8",
+            "method": "text_year_tfidf_svd_minibatch_kmeans",
+            "labels_used_in_structure": false,
+            "label_blind_order_sha256": "b15c8d0dd5db7d167f3937c7a5c4373eab26f15883030b42dc4ee3e8787b998c",
+            "year_weighting": "proportional",
+            "target_year_weights": {
+              "2006": 0.011295163979988882,
+              "2007": 0.04953863257365203,
+              "2008": 0.15872151195108394,
+              "2009": 0.2717732073374097,
+              "2010": 0.5086714841578655
+            },
+            "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+            "labels_used_in_ordering": false,
+            "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+          },
+          "evaluation": {
+            "within": {
+              "diversity_order": {
+                "rows": 89963,
+                "target_total": 2000,
+                "years": [
+                  "2011",
+                  "2012"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 499,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "562beb31db700e556335c649b722bab90b3e830c4f140c0e8ff02d258f594f72",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "0cee8aebe0039f9945b132d4542ff6bdf50810ecfc99a5dcba311747c90575b0",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2011": 0.43645721018641,
+                  "2012": 0.5635427898135901
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_43\\within_2011_2012_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_43\\within_2011_2012_n1000_per_label_total2000.csv"
+              }
+            },
+            "short": {
+              "diversity_order": {
+                "rows": 89957,
+                "target_total": 2000,
+                "years": [
+                  "2015"
+                ],
+                "n_years": 1,
+                "n_clusters": 300,
+                "n_year_cluster_cells": 300,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "23e626f0314bef6b4086f0c786fe1120c15bd93e65a7027fc49d460028dda2dc",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "f38e999be630acb9456b8a63c2ce4440e9364727e38bb9721dec994daa066f68",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2015": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_43\\short_2015_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_43\\short_2015_n1000_per_label_total2000.csv"
+              }
+            },
+            "long": {
+              "diversity_order": {
+                "rows": 89983,
+                "target_total": 2000,
+                "years": [
+                  "2019",
+                  "2020"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 500,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "bc8f1b39c973026a6ab65b66ff7648d8dd9f169cd2ffcf75572da9230d529098",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "7d1bb288509d72ebfcc1eb77c9c32d7a8fbfa84797871b1fc986f6d91db810af",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2019": 0.6115599613260283,
+                  "2020": 0.38844003867397175
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_43\\long_2019_2020_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_43\\long_2019_2020_n1000_per_label_total2000.csv"
+              }
+            }
+          }
+        },
+        "44": {
+          "train": "yelp\\seed_44\\train_7000.csv",
+          "validation": "yelp\\seed_44\\validation_3000.csv",
+          "historical_diversity_order": {
+            "rows": 89950,
+            "target_total": 10000,
+            "years": [
+              "2006",
+              "2007",
+              "2008",
+              "2009",
+              "2010"
+            ],
+            "n_years": 5,
+            "n_clusters": 512,
+            "n_year_cluster_cells": 2390,
+            "word_max_features": 12000,
+            "char_max_features": 12000,
+            "svd_components": 64,
+            "structure_sha256": "de0b668d504756294c501b79f47b46191c778a94383851018ed29d7e85f8cdb8",
+            "method": "text_year_tfidf_svd_minibatch_kmeans",
+            "labels_used_in_structure": false,
+            "label_blind_order_sha256": "d009d8f9a7327bc8f48e8b997f64b79f1c40031ca56b75fab03f6e7beb77d4f0",
+            "year_weighting": "proportional",
+            "target_year_weights": {
+              "2006": 0.011295163979988882,
+              "2007": 0.04953863257365203,
+              "2008": 0.15872151195108394,
+              "2009": 0.2717732073374097,
+              "2010": 0.5086714841578655
+            },
+            "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+            "labels_used_in_ordering": false,
+            "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+          },
+          "evaluation": {
+            "within": {
+              "diversity_order": {
+                "rows": 89963,
+                "target_total": 2000,
+                "years": [
+                  "2011",
+                  "2012"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 499,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "562beb31db700e556335c649b722bab90b3e830c4f140c0e8ff02d258f594f72",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "ff92ec96928e1bd528fa48b5055196e5811585d9dc4379a817dcbfe6c810462f",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2011": 0.43645721018641,
+                  "2012": 0.5635427898135901
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_44\\within_2011_2012_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_44\\within_2011_2012_n1000_per_label_total2000.csv"
+              }
+            },
+            "short": {
+              "diversity_order": {
+                "rows": 89957,
+                "target_total": 2000,
+                "years": [
+                  "2015"
+                ],
+                "n_years": 1,
+                "n_clusters": 300,
+                "n_year_cluster_cells": 300,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "23e626f0314bef6b4086f0c786fe1120c15bd93e65a7027fc49d460028dda2dc",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "6a34e88e459eb140b31b9e707adfb892d117ea581d612024654acb3a0fb3a44d",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2015": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_44\\short_2015_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_44\\short_2015_n1000_per_label_total2000.csv"
+              }
+            },
+            "long": {
+              "diversity_order": {
+                "rows": 89983,
+                "target_total": 2000,
+                "years": [
+                  "2019",
+                  "2020"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 500,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "bc8f1b39c973026a6ab65b66ff7648d8dd9f169cd2ffcf75572da9230d529098",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "e84b4a6b57f955376c42cd3f18347507c6dca5b61643aa30dbeb3397f69ea697",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2019": 0.6115599613260283,
+                  "2020": 0.38844003867397175
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_44\\long_2019_2020_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_44\\long_2019_2020_n1000_per_label_total2000.csv"
+              }
+            }
+          }
+        },
+        "45": {
+          "train": "yelp\\seed_45\\train_7000.csv",
+          "validation": "yelp\\seed_45\\validation_3000.csv",
+          "historical_diversity_order": {
+            "rows": 89950,
+            "target_total": 10000,
+            "years": [
+              "2006",
+              "2007",
+              "2008",
+              "2009",
+              "2010"
+            ],
+            "n_years": 5,
+            "n_clusters": 512,
+            "n_year_cluster_cells": 2390,
+            "word_max_features": 12000,
+            "char_max_features": 12000,
+            "svd_components": 64,
+            "structure_sha256": "de0b668d504756294c501b79f47b46191c778a94383851018ed29d7e85f8cdb8",
+            "method": "text_year_tfidf_svd_minibatch_kmeans",
+            "labels_used_in_structure": false,
+            "label_blind_order_sha256": "a47ae99e6d5a514c7454c6cc5a4aad89d307df910cee410643dd5f2227a4612c",
+            "year_weighting": "proportional",
+            "target_year_weights": {
+              "2006": 0.011295163979988882,
+              "2007": 0.04953863257365203,
+              "2008": 0.15872151195108394,
+              "2009": 0.2717732073374097,
+              "2010": 0.5086714841578655
+            },
+            "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+            "labels_used_in_ordering": false,
+            "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+          },
+          "evaluation": {
+            "within": {
+              "diversity_order": {
+                "rows": 89963,
+                "target_total": 2000,
+                "years": [
+                  "2011",
+                  "2012"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 499,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "562beb31db700e556335c649b722bab90b3e830c4f140c0e8ff02d258f594f72",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "3159ff0dbd485162f64c9f8adfa4cfce21fd5533871c9eaf36232fc8a6ce16fa",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2011": 0.43645721018641,
+                  "2012": 0.5635427898135901
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_45\\within_2011_2012_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_45\\within_2011_2012_n1000_per_label_total2000.csv"
+              }
+            },
+            "short": {
+              "diversity_order": {
+                "rows": 89957,
+                "target_total": 2000,
+                "years": [
+                  "2015"
+                ],
+                "n_years": 1,
+                "n_clusters": 300,
+                "n_year_cluster_cells": 300,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "23e626f0314bef6b4086f0c786fe1120c15bd93e65a7027fc49d460028dda2dc",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "c9fec59d5cfba9faa76be8c5360097e1af02083b36389efd770c661bb20be07a",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2015": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_45\\short_2015_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_45\\short_2015_n1000_per_label_total2000.csv"
+              }
+            },
+            "long": {
+              "diversity_order": {
+                "rows": 89983,
+                "target_total": 2000,
+                "years": [
+                  "2019",
+                  "2020"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 500,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "bc8f1b39c973026a6ab65b66ff7648d8dd9f169cd2ffcf75572da9230d529098",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "a488d08f7b0cf40a5d502653ff65ec6de34d3e8194fbd13759f6ae2cbc9cc11d",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2019": 0.6115599613260283,
+                  "2020": 0.38844003867397175
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_45\\long_2019_2020_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_45\\long_2019_2020_n1000_per_label_total2000.csv"
+              }
+            }
+          }
+        },
+        "46": {
+          "train": "yelp\\seed_46\\train_7000.csv",
+          "validation": "yelp\\seed_46\\validation_3000.csv",
+          "historical_diversity_order": {
+            "rows": 89950,
+            "target_total": 10000,
+            "years": [
+              "2006",
+              "2007",
+              "2008",
+              "2009",
+              "2010"
+            ],
+            "n_years": 5,
+            "n_clusters": 512,
+            "n_year_cluster_cells": 2390,
+            "word_max_features": 12000,
+            "char_max_features": 12000,
+            "svd_components": 64,
+            "structure_sha256": "de0b668d504756294c501b79f47b46191c778a94383851018ed29d7e85f8cdb8",
+            "method": "text_year_tfidf_svd_minibatch_kmeans",
+            "labels_used_in_structure": false,
+            "label_blind_order_sha256": "234e401a6fe1fabdea3505edf94bdfb48b0db39b2e405159b2c69ab1e99011f5",
+            "year_weighting": "proportional",
+            "target_year_weights": {
+              "2006": 0.011295163979988882,
+              "2007": 0.04953863257365203,
+              "2008": 0.15872151195108394,
+              "2009": 0.2717732073374097,
+              "2010": 0.5086714841578655
+            },
+            "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+            "labels_used_in_ordering": false,
+            "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+          },
+          "evaluation": {
+            "within": {
+              "diversity_order": {
+                "rows": 89963,
+                "target_total": 2000,
+                "years": [
+                  "2011",
+                  "2012"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 499,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "562beb31db700e556335c649b722bab90b3e830c4f140c0e8ff02d258f594f72",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "955d9ad5829127eb63d5ca473bbf5f1a7ec52db4dd4e4fdba952626049053d1c",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2011": 0.43645721018641,
+                  "2012": 0.5635427898135901
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_46\\within_2011_2012_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_46\\within_2011_2012_n1000_per_label_total2000.csv"
+              }
+            },
+            "short": {
+              "diversity_order": {
+                "rows": 89957,
+                "target_total": 2000,
+                "years": [
+                  "2015"
+                ],
+                "n_years": 1,
+                "n_clusters": 300,
+                "n_year_cluster_cells": 300,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "23e626f0314bef6b4086f0c786fe1120c15bd93e65a7027fc49d460028dda2dc",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "0ca5701002d149971d1684581e6315e4d5be387c9d32c26504eb6d71f64d152a",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2015": 1.0
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_46\\short_2015_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_46\\short_2015_n1000_per_label_total2000.csv"
+              }
+            },
+            "long": {
+              "diversity_order": {
+                "rows": 89983,
+                "target_total": 2000,
+                "years": [
+                  "2019",
+                  "2020"
+                ],
+                "n_years": 2,
+                "n_clusters": 250,
+                "n_year_cluster_cells": 500,
+                "word_max_features": 12000,
+                "char_max_features": 12000,
+                "svd_components": 64,
+                "structure_sha256": "bc8f1b39c973026a6ab65b66ff7648d8dd9f169cd2ffcf75572da9230d529098",
+                "method": "text_year_tfidf_svd_minibatch_kmeans",
+                "labels_used_in_structure": false,
+                "label_blind_order_sha256": "24686b99215b4bdec8ed4201d5be1c0e5e701fbf3ff0199b8fba2939d2ddfe82",
+                "year_weighting": "proportional",
+                "target_year_weights": {
+                  "2019": 0.6115599613260283,
+                  "2020": 0.38844003867397175
+                },
+                "ordering_method": "seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge",
+                "labels_used_in_ordering": false,
+                "full_method": "text_year_tfidf_svd_minibatch_kmeans+seed_specific_central_cluster_representatives_then_proportional_year_weighted_fair_merge"
+              },
+              "balanced_samples": {
+                "500": "yelp\\seed_46\\long_2019_2020_n500_per_label_total1000.csv",
+                "1000": "yelp\\seed_46\\long_2019_2020_n1000_per_label_total2000.csv"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "environment": {
+    "python": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "pandas": "2.3.3",
+    "numpy": "1.26.4"
+  }
+}

@@ -1,0 +1,75 @@
+# Beyond Accuracy Reproduction Configuration
+# -------------------------------------------------------------
+# Configuration for datasets, models, periods, seeds, and paths.
+
+dataset_settings:
+  - name: "Climate n500"
+    dataset: "climate"
+    n_per_label: 500
+    labels: ["BELIEVER", "DENIER"]
+    gold_col: "true_label"
+    pred_col: "predicted_label"
+    digest_col: "text_sha256"
+
+  - name: "Yelp n500"
+    dataset: "yelp"
+    n_per_label: 500
+    labels: ["NEG", "POS"]
+    gold_col: "gold_label"
+    pred_col: "pred_label"
+    digest_col: "text_sha1"
+
+  - name: "Yelp n1000"
+    dataset: "yelp"
+    n_per_label: 1000
+    labels: ["NEG", "POS"]
+    gold_col: "gold_label"
+    pred_col: "pred_label"
+    digest_col: "text_sha1"
+
+periods: ["within", "short", "long"]
+seeds: [42, 43, 44, 45, 46]
+
+models:
+  - id: "distilbert"
+    slug: "distilbert"
+    display_name: "DistilBERT"
+    latex_name: "DistilBERT"
+    family: "supervised"
+    prompt: ""
+
+  - id: "tfidf_lr"
+    slug: "tfidf_lr"
+    display_name: "TF-IDF+LR"
+    latex_name: "TF--IDF+LR"
+    family: "supervised"
+    prompt: ""
+
+  - id: "phi3.5:latest"
+    slug: "phi3.5_latest"
+    display_name: "phi3.5:latest"
+    latex_name: "\\texttt{phi}"
+    latex_long_name: "\\texttt{phi3.5:latest}"
+    family: "llm"
+    prompt: "p3_json_strict"
+
+  - id: "qwen2.5:3b-instruct"
+    slug: "qwen2.5_3b-instruct"
+    display_name: "qwen2.5:3b-instruct"
+    latex_name: "\\texttt{qwen}"
+    latex_long_name: "\\texttt{qwen2.5:3b-instruct}"
+    family: "llm"
+    prompt: "p3_json_strict"
+
+paths:
+  archives_dir: "archives"
+  splits_dir: "data/splits"
+  outputs_tables_dir: "outputs/tables"
+  outputs_figures_dir: "outputs/figures"
+
+archive_filenames:
+  climate: "completed_prediction_audit.zip"
+  yelp_frozen: "original_yelp_frozen_predictions.zip"
+  yelp_aligned: "yelp_prediction_alignment.zip"
+  yelp_metrics: "code_and_remaining_results.zip"
+  yelp_frozen_metrics: "yelp_results_audit.zip"
