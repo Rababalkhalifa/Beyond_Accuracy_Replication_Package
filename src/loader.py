@@ -82,6 +82,12 @@ class ArchiveManager:
             path = f"predictions/frozen/{slug}/p3_json_strict/climate/seed_{seed}/{period}_n500_per_label.csv"
         return self.get_csv("climate", path)
 
+    def load_climate_prompt_predictions(self, model: str, prompt_id: str, seed: int, period: str = "within") -> List[Dict[str, str]]:
+        """Load Climate predictions for a specific prompt configuration (e.g. p1_minimal, p3_json_strict, p5_abstain)."""
+        slug = MODEL_SLUGS[model]
+        path = f"predictions/frozen/{slug}/{prompt_id}/climate/seed_{seed}/{period}_n500_per_label.csv"
+        return self.get_csv("climate", path)
+
     def load_yelp_predictions(self, model: str, n_per_label: int, seed: int, period: str) -> List[Dict[str, str]]:
         """Load Yelp sentiment predictions for a given model, sample size, seed, and period."""
         if model in ("distilbert", "tfidf_lr"):
@@ -92,6 +98,12 @@ class ArchiveManager:
             slug = MODEL_SLUGS[model]
             path = f"predictions/frozen/{slug}/seed{seed}/n{n_per_label}_{period}_p3_json_strict.csv"
             return self.get_csv("yelp_frozen", path)
+
+    def load_yelp_prompt_predictions(self, model: str, prompt_id: str, n_per_label: int, seed: int, period: str = "within") -> List[Dict[str, str]]:
+        """Load Yelp frozen predictions for a specific prompt configuration (e.g. p1_minimal, p3_json_strict, p5_abstain)."""
+        slug = MODEL_SLUGS[model]
+        path = f"predictions/frozen/{slug}/seed{seed}/n{n_per_label}_{period}_{prompt_id}.csv"
+        return self.get_csv("yelp_frozen", path)
 
     def load_climate_metrics_index(self) -> Dict[Tuple[str, str, int, str], Dict[str, str]]:
         """Load cached Climate metrics index: (setting, model, seed, period) -> record."""

@@ -1,26 +1,26 @@
 \begin{table*}[t]
 \centering
 \small
-\caption{Temporal Macro-F1 across the within-period reference and short- and long-distance target periods. Values are means across five sampling seeds. For each seed, $\Delta$ is within-period Macro-F1 minus target-period Macro-F1; negative values indicate higher performance on the target sample. Climate is stance classification and Yelp is sentiment classification.}
+\caption{Macro-F1 across the reference ($T_0$), short-distance ($T_1$), and long-distance ($T_2$) evaluation periods. Values are means over five sampling seeds. Temporal changes are computed within each seed as $\Delta_j=F_1(T_j)-F_1(T_0)$ and then averaged; positive changes indicate higher target-period performance. Boldface marks the highest mean Macro-F1 in each setting and period, not a statistically established difference.}
 \label{tab:temporal-robustness}
 \begin{tabular}{llrrrrr}
 \toprule
-\textbf{Dataset setting} & \textbf{Model} & \textbf{Within F1} & \textbf{Short F1} & \textbf{Long F1} & $\Delta$ \textbf{short} & $\Delta$ \textbf{long} \\
+\textbf{Dataset setting} & \textbf{Model} & \textbf{Reference F1} & \textbf{Short F1} & \textbf{Long F1} & $\Delta$ \textbf{short} & $\Delta$ \textbf{long} \\
 \midrule
-\textbf{Climate n500} & DistilBERT & 0.8876 & 0.8618 & 0.8706 & 0.0258 & 0.0170 \\
- & TF--IDF+LR & 0.8001 & 0.7120 & 0.7719 & 0.0881 & 0.0282 \\
- & \texttt{phi} & 0.7124 & 0.7057 & 0.7398 & 0.0067 & -0.0275 \\
- & \texttt{qwen} & 0.6263 & 0.5978 & 0.7282 & 0.0285 & -0.1019 \\
+\textbf{Climate n500} & DistilBERT & 0.8876 & 0.8618 & 0.8706 & -0.0258 & -0.0170 \\
+ & TF--IDF+LR & 0.8001 & 0.7120 & 0.7719 & -0.0881 & -0.0282 \\
+ & \texttt{phi} & 0.7124 & 0.7057 & 0.7398 & -0.0067 & +0.0275 \\
+ & \texttt{qwen} & 0.6263 & 0.5978 & 0.7282 & -0.0285 & +0.1019 \\
 \midrule
-\textbf{Yelp n500} & DistilBERT & 0.9324 & 0.9508 & 0.9606 & -0.0184 & -0.0282 \\
- & TF--IDF+LR & 0.9045 & 0.9130 & 0.9318 & -0.0084 & -0.0272 \\
- & \texttt{phi} & 0.9452 & 0.9650 & 0.9706 & -0.0198 & -0.0254 \\
- & \texttt{qwen} & 0.9602 & 0.9736 & 0.9756 & -0.0134 & -0.0154 \\
+\textbf{Yelp n500} & DistilBERT & 0.9324 & 0.9508 & 0.9606 & +0.0184 & +0.0282 \\
+ & TF--IDF+LR & 0.9045 & 0.9130 & 0.9318 & +0.0084 & +0.0272 \\
+ & \texttt{phi} & 0.9452 & 0.9650 & 0.9706 & +0.0198 & +0.0254 \\
+ & \texttt{qwen} & 0.9602 & 0.9736 & 0.9756 & +0.0134 & +0.0154 \\
 \midrule
-\textbf{Yelp n1000} & DistilBERT & 0.9348 & 0.9538 & 0.9623 & -0.0190 & -0.0275 \\
- & TF--IDF+LR & 0.9063 & 0.9184 & 0.9293 & -0.0121 & -0.0230 \\
- & \texttt{phi} & 0.9448 & 0.9642 & 0.9725 & -0.0194 & -0.0277 \\
- & \texttt{qwen} & 0.9601 & 0.9740 & 0.9773 & -0.0139 & -0.0172 \\
+\textbf{Yelp n1000} & DistilBERT & 0.9348 & 0.9538 & 0.9623 & +0.0190 & +0.0275 \\
+ & TF--IDF+LR & 0.9063 & 0.9184 & 0.9293 & +0.0121 & +0.0230 \\
+ & \texttt{phi} & 0.9448 & 0.9642 & 0.9725 & +0.0194 & +0.0277 \\
+ & \texttt{qwen} & 0.9601 & 0.9740 & 0.9773 & +0.0139 & +0.0172 \\
 \bottomrule
 \end{tabular}
 \end{table*}

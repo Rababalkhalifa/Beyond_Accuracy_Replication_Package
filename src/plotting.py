@@ -145,3 +145,166 @@ def plot_coverage_and_rankings(
     plt.close(fig)
 
     return saved_paths
+
+
+def plot_figure5_movement_vs_response(
+    forensics_rows: Sequence[Dict[str, any]],
+    delta_rows: Sequence[Dict[str, any]],
+    out_dir: Union[str, Path],
+    filename_stem: str = "Figure5_movement_vs_response"
+) -> List[Path]:
+    """Generate publication Figure 5: Movement vs. Response dual-panel heatmap."""
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    condition_order = [
+        ("Climate n500", "short"),
+        ("Climate n500", "long"),
+        ("Yelp n500", "short"),
+        ("Yelp n500", "long"),
+        ("Yelp n1000", "short"),
+        ("Yelp n1000", "long"),
+    ]
+
+    model_order = [
+        "distilbert",
+        "tfidf_lr",
+        "phi3.5:latest",
+        "qwen2.5:3b-instruct",
+    ]
+
+    model_names = {
+        "distilbert": "DistilBERT",
+        "tfidf_lr": "TF-IDF LR",
+        "phi3.5:latest": "Phi",
+        "qwen2.5:3b-instruct": "Qwen",
+    }
+
+    metric_cols = {
+        "Novelty": "lexical_novelty_mean",
+        "JSD": "js_divergence_mean",
+        "ΔC100": "top100_mass_change_mean",
+        "Δ length": "mean_length_change_mean",
+        "Overlap loss": "overlap_loss_mean",
+        "Marker\nasymmetry": "class_marker_asymmetry_mean",
+    }
+    metric_names = list(metric_cols.keys())
+
+    # Map forensics rows
+    rq5_map = {(r["dataset_setting"], r["target"]): r for r in forensics_rows}
+
+    # Format annotations and relative intensities
+    def format_forensic_value(metric, value):
+        if metric == "Δ length":
+            return f"↑ {abs(value):.1f}" if value > 0 else (f"↓ {abs(value):.1f}" if value < 0 else "0.0")
+        if metric == "ΔC100":
+            return f"↑ {abs(value):.3f}" if value > 0 else (f"↓ {abs(value):.3f}" if value < 0 else "0.000")
+        return f"{value:.3f}"
+
+    heat_a = []
+    annot_a = []
+
+    for setting, target in condition_order:
+        row = rq5_map[setting, target]
+        heat_row = []
+        text_row = []
+        for metric, col in metric_cols.items():
+            val = float(row[col])
+            all_vals = [abs(float(rq5_map[s, t][col])) if metric in ("ΔC100", "Δ length")
+                        else float(rq5_map[s, t][col]) for s, t in condition_order]
+            max_val = max(all_vals)
+            mag = abs(val) if metric in ("ΔC100", "Δ length") else val
+            rel = (mag / max_val) if max_val > 0 else 0.0
+            heat_row.append(rel)
+            text_row.append(format_forensic_value(metric, val))
+        heat_a.append(heat_row)
+        annot_a.append(text_row)
+
+    heat_a = np.array(heat_a)
+    row_labels = [f"{dataset}\n{target.capitalize()}" for dataset, target in condition_order]
+
+    # Panel B Response Matrix
+    delta_map = {(r["dataset_setting"], r["target"], r["model"]): r for r in delta_rows}
+    response_matrix = np.zeros((len(condition_order), len(model_order)))
+
+    for i, (setting, target) in enumerate(condition_order):
+        for j, model in enumerate(model_order):
+            if (setting, target, model) in delta_map:
+                row = delta_map[setting, target, model]
+                # Check for either delta_macro_f1_mean or delta_short/delta_long
+                if "delta_macro_f1_mean" in row:
+                    val = float(row["delta_macro_f1_mean"])
+                elif target == "short" and "delta_short" in row:
+                    val = float(row["delta_short"])
+                elif target == "long" and "delta_long" in row:
+                    val = float(row["delta_long"])
+                else:
+                    val = 0.0
+                response_matrix[i, j] = val
+
+    response_limit = float(np.max(np.abs(response_matrix))) if np.max(np.abs(response_matrix)) > 0 else 0.1
+
+    # Plot dual-panel figure
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(17, 9), gridspec_kw={"width_ratios": [1.25, 0.95], "wspace": 0.28})
+
+    im1 = ax1.imshow(heat_a, aspect="auto", cmap="YlOrRd", vmin=0, vmax=1)
+    ax1.set_title("A. Dataset-side temporal movement", fontweight="bold", fontsize=15, pad=16)
+    ax1.set_xticks(np.arange(len(metric_names)))
+    ax1.set_xticklabels(metric_names, fontweight="bold")
+    ax1.set_yticks(np.arange(len(row_labels)))
+    ax1.set_yticklabels(row_labels, fontweight="bold")
+
+    ax1.set_xticks(np.arange(-0.5, len(metric_names), 1), minor=True)
+    ax1.set_yticks(np.arange(-0.5, len(row_labels), 1), minor=True)
+    ax1.grid(which="minor", color="white", linewidth=2)
+    ax1.tick_params(which="minor", bottom=False, left=False)
+
+    for i in range(heat_a.shape[0]):
+        for j in range(heat_a.shape[1]):
+            strength = heat_a[i, j]
+            color = "white" if strength >= 0.62 else "black"
+            ax1.text(j, i, annot_a[i][j], ha="center", va="center", fontsize=12, fontweight="bold", color=color)
+
+    cbar1 = fig.colorbar(im1, ax=ax1, fraction=0.045, pad=0.035)
+    cbar1.set_label("Relative magnitude within each metric", fontsize=11, fontweight="bold")
+
+    im2 = ax2.imshow(response_matrix, aspect="auto", cmap="RdYlGn", vmin=-response_limit, vmax=response_limit)
+    ax2.set_title("B. Model response", fontweight="bold", fontsize=15, pad=16)
+    ax2.set_xticks(np.arange(len(model_order)))
+    ax2.set_xticklabels([model_names[m] for m in model_order], fontweight="bold")
+    ax2.set_yticks(np.arange(len(row_labels)))
+    ax2.set_yticklabels(row_labels, fontweight="bold")
+
+    ax2.set_xticks(np.arange(-0.5, len(model_order), 1), minor=True)
+    ax2.set_yticks(np.arange(-0.5, len(row_labels), 1), minor=True)
+    ax2.grid(which="minor", color="white", linewidth=2)
+    ax2.tick_params(which="minor", bottom=False, left=False)
+
+    for i in range(response_matrix.shape[0]):
+        for j in range(response_matrix.shape[1]):
+            val = response_matrix[i, j]
+            rel = (abs(val) / response_limit) if response_limit > 0 else 0
+            text_color = "white" if rel >= 0.60 else "black"
+            cell_text = f"↑ {val:.3f}" if val > 0 else (f"↓ {abs(val):.3f}" if val < 0 else "0.000")
+            ax2.text(j, i, cell_text, ha="center", va="center", fontsize=12, fontweight="bold", color=text_color)
+
+    ax2.text(0.0, 1.025, "↓ lower Macro-F1", transform=ax2.transAxes, ha="left", va="bottom", fontsize=10.5, fontweight="bold")
+    ax2.text(1.0, 1.025, "↑ higher Macro-F1", transform=ax2.transAxes, ha="right", va="bottom", fontsize=10.5, fontweight="bold")
+
+    cbar2 = fig.colorbar(im2, ax=ax2, fraction=0.050, pad=0.04)
+    cbar2.set_label("ΔMacro-F1 (target − within)", fontsize=11, fontweight="bold")
+
+    for ax in [ax1, ax2]:
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+
+    fig.suptitle("Temporal movement profiles and corresponding model-performance changes", fontsize=17, fontweight="bold", y=0.98)
+
+    saved_paths = []
+    for ext in ("svg", "pdf", "png"):
+        p = out / f"{filename_stem}.{ext}"
+        fig.savefig(p, dpi=220, facecolor="white", bbox_inches="tight")
+        saved_paths.append(p)
+    plt.close(fig)
+
+    return saved_paths

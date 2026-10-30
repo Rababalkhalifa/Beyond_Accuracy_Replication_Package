@@ -11,7 +11,8 @@ import sys
 from pathlib import Path
 
 # Add project root to sys.path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(BASE_DIR))
 
 from src.loader import ArchiveManager
 from src.metrics import calc_condition_metrics
@@ -23,13 +24,13 @@ SETTINGS = ("Climate n500", "Yelp n500", "Yelp n1000")
 
 
 def generate_table8(archives_dir: Path, out_dir: Path) -> list:
+    archives_dir = Path(archives_dir).resolve()
+    out_dir = Path(out_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     
     with ArchiveManager(archives_dir) as mgr:
-        # Load Yelp supervised latency lookup
         yelp_metrics = mgr.load_yelp_metrics_indices()
         
-        # Collect per-seed records
         records = {}
         for setting in SETTINGS:
             n = 1000 if setting.endswith("1000") else 500
@@ -54,7 +55,6 @@ def generate_table8(archives_dir: Path, out_dir: Path) -> list:
 
                     records[setting, model, seed] = m
 
-        # Aggregate across five seeds
         summary_rows = []
         for setting in SETTINGS:
             for model in MODELS:
@@ -98,9 +98,9 @@ def generate_table8(archives_dir: Path, out_dir: Path) -> list:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Reproduce RQ1 Table 8.")
-    parser.add_argument("--archives-dir", type=Path, default=Path("archives"),
-                        help="Path to directory containing zip archives")
-    parser.add_argument("--out-dir", type=Path, default=Path("outputs/tables"),
-                        help="Path to output directory for tables")
+    parser.add_argument("--archives-dir", type=Path, default=BASE_DIR / "archives",
+                        help="Path to directory containing prediction archives")
+    parser.add_argument("--out-dir", type=Path, default=BASE_DIR / "outputs" / "tables",
+                        help="Output directory for generated tables")
     args = parser.parse_args()
     generate_table8(args.archives_dir, args.out_dir)

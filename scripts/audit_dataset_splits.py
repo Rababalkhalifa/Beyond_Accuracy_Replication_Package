@@ -11,13 +11,17 @@ import sys
 from pathlib import Path
 
 # Add project root to sys.path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(BASE_DIR))
 
 from src.audit import audit_splits, audit_predictions_and_metrics
 from src.loader import ArchiveManager
 
 
 def run_audit(splits_dir: Path, archives_dir: Path) -> bool:
+    splits_dir = Path(splits_dir).resolve()
+    archives_dir = Path(archives_dir).resolve()
+
     print("\n" + "=" * 80)
     print("STEP 1: Auditing Dataset Splits & SHA-256 Checksums")
     print("=" * 80)
@@ -49,9 +53,9 @@ def run_audit(splits_dir: Path, archives_dir: Path) -> bool:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Audit dataset splits and prediction integrity.")
-    parser.add_argument("--splits-dir", type=Path, default=Path("data/splits"),
+    parser.add_argument("--splits-dir", type=Path, default=BASE_DIR / "data" / "splits",
                         help="Path to directory containing dataset splits and checksums_sha256.txt")
-    parser.add_argument("--archives-dir", type=Path, default=Path("archives"),
+    parser.add_argument("--archives-dir", type=Path, default=BASE_DIR / "archives",
                         help="Path to directory containing prediction archives")
     args = parser.parse_args()
     success = run_audit(args.splits_dir, args.archives_dir)

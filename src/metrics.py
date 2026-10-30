@@ -1,9 +1,13 @@
-"""Mathematical metrics computation for classification, calibration, and selective risk.
+"""Mathematical metrics computation for classification, calibration, selective prediction, and temporal movement.
 
-Guarantees exact parity with the paper's canonical definitions:
-- Macro-F1: Balanced unweighted average of per-class F1 scores.
-- ECE-10: 10 equal-width bins over [0, 1] with right-boundary closure for 1.0.
-- Selective Risk: Exact expected error rate for fractional tie-handling.
+Guarantees exact parity with the paper's canonical mathematical definitions (Equations 1-17, Table 3):
+- Precision, Recall, Class-F1, Macro-F1 (Equations 1-4)
+- Accuracy (Equation 5)
+- Temporal Macro-F1 Change Delta (Equation 6): Target minus Reference (positive = improvement, negative = decline)
+- Expected Calibration Error with 10 bins (Equations 7-9): ECE-10
+- Prompt Sensitivity (Equation 10): S_prompt = max(F1) - min(F1) across prompt configurations
+- Selective Risk at Coverage c (Equation 11): R(c) with exact fractional tie-handling
+- Explicit Abstention Metrics: Abstain Rate A, Retained Coverage C_ret, Post-abstention Error R_ret
 """
 
 import math
@@ -12,13 +16,24 @@ from typing import Dict, List, Optional, Sequence, Tuple, Union
 import numpy as np
 
 
+def accuracy(
+    correct: Sequence[Union[bool, int]]
+) -> float:
+    """Compute classification accuracy (Equation 5): (1/N) * sum I(y_hat == y)."""
+    if not correct:
+        raise ValueError("Sequence cannot be empty.")
+    return float(np.mean(correct))
+
+
 def macro_f1(
     rows: Sequence[Dict[str, str]],
     labels: Sequence[str],
     gold_key: str,
     pred_key: str
 ) -> float:
-    """Compute unweighted Macro-F1 across the given class labels."""
+    """Compute unweighted Macro-F1 across class labels (Equations 1-4): (1/|Y|) * sum F1_k."""
+    if not rows:
+        raise ValueError("Prediction rows cannot be empty.")
     f1_scores = []
     for label in labels:
         tp = sum(r[gold_key] == label and r[pred_key] == label for r in rows)
@@ -29,11 +44,31 @@ def macro_f1(
     return float(statistics.mean(f1_scores))
 
 
+def temporal_delta(
+    f1_target: float,
+    f1_reference: float
+) -> float:
+    """Compute temporal robustness delta (Equation 6): Delta_j = MacroF1(T_j) - MacroF1(T_0).
+    
+    Positive indicates performance improvement on target; negative indicates degradation.
+    """
+    return float(f1_target - f1_reference)
+
+
+def prompt_sensitivity(
+    f1_scores_across_prompts: Sequence[float]
+) -> float:
+    """Compute prompt-configuration sensitivity (Equation 10): S_prompt = max(F1_p) - min(F1_p)."""
+    if not f1_scores_across_prompts:
+        raise ValueError("Prompt F1 scores list cannot be empty.")
+    return float(max(f1_scores_across_prompts) - min(f1_scores_across_prompts))
+
+
 def ece_10(
     correct: Sequence[Union[bool, int, float]],
     confidence: Sequence[float]
 ) -> float:
-    """Compute Expected Calibration Error (ECE) using 10 equal-width bins.
+    """Compute Expected Calibration Error (ECE) using 10 equal-width bins (Equations 7-9).
     
     Bins span [0.0, 1.0] with width 0.1. An example with confidence 1.0 falls
     into the 10th bin [0.9, 1.0].
@@ -68,7 +103,7 @@ def risk_sweep(
     scores: Sequence[float],
     errors: Sequence[Union[bool, int, float]]
 ) -> List[float]:
-    """Compute expected error rate across coverage levels 20%..100% (step 1%).
+    """Compute selective risk R(c) across coverage levels 20%..100% in 1% steps (Equation 11).
     
     Implements fractional inclusion of tied confidence scores, representing the
     expected error under uniform random tie-breaking.
@@ -94,6 +129,46 @@ def risk_sweep(
         result.append(float(retained_error))
 
     return result
+
+
+def abstention_metrics(
+    true_labels: Sequence[str],
+    pred_labels: Sequence[str],
+    abstained: Sequence[bool]
+) -> Dict[str, float]:
+    """Compute explicit abstention metrics (Table 3):
+    
+    - total_n: total number of attempted examples
+    - abstained_count: number of abstained predictions (a_i = 1)
+    - abstain_rate: A = (1/N) * sum a_i
+    - retained_coverage: C_ret = 1 - A
+    - incorrect_among_abstained: number of abstained examples where pred != true
+    - error_before_pct: percentage error before abstention
+    - error_after_pct: percentage error on retained predictions
+    - error_reduction_pp: percentage point reduction in error (before - after)
+    """
+    n = len(true_labels)
+    if n == 0 or len(pred_labels) != n or len(abstained) != n:
+        raise ValueError("Input sequences must be non-empty and of identical length.")
+
+    wrong = [t != p for t, p in zip(true_labels, pred_labels)]
+    abst_cnt = sum(abstained)
+    retained_wrong = [w for w, a in zip(wrong, abstained) if not a]
+    abst_wrong = sum(w for w, a in zip(wrong, abstained) if a)
+
+    err_before = (sum(wrong) / n) * 100.0
+    err_after = (sum(retained_wrong) / len(retained_wrong) * 100.0) if retained_wrong else 0.0
+
+    return {
+        "total_n": n,
+        "abstained_count": abst_cnt,
+        "abstain_rate": abst_cnt / n,
+        "retained_coverage": 1.0 - (abst_cnt / n),
+        "incorrect_among_abstained": abst_wrong,
+        "error_before_pct": err_before,
+        "error_after_pct": err_after,
+        "error_reduction_pp": err_before - err_after
+    }
 
 
 def calc_condition_metrics(

@@ -1,0 +1,28 @@
+\begin{table*}[t]
+\centering\footnotesize
+\caption{Calibration and confidence-based selective risk across evaluation periods (five-seed means). $R_{80}$ and $R_{100}$ are retained error at 80\% and 100\% coverage, respectively; $R_{100}=1-\mathrm{Accuracy}$. Boldface marks the lowest mean for each metric and period within a dataset setting and does not establish a statistically reliable difference. Supervised confidence is the maximum predicted class probability; frozen models use P3 self-reported confidence. Ties at the coverage cutoff receive equal fractional inclusion.}
+\label{tab:temporal-reliability}
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+& & \multicolumn{3}{c}{ECE} & \multicolumn{3}{c}{$R_{80}$} & \multicolumn{3}{c}{$R_{100}$} \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}
+Dataset setting & Model & Reference & Short & Long & Reference & Short & Long & Reference & Short & Long \\
+\midrule
+\textbf{Climate n500} & DistilBERT & 0.0994 & 0.1227 & 0.1142 & \textbf{0.0488} & \textbf{0.0800} & \textbf{0.0685} & \textbf{0.1122} & \textbf{0.1376} & \textbf{0.1292} \\
+ & TF--IDF+LR & \textbf{0.0264} & \textbf{0.0563} & \textbf{0.0267} & 0.1377 & 0.2240 & 0.1698 & 0.1982 & 0.2746 & 0.2260 \\
+ & \texttt{phi3.5:latest} & 0.2233 & 0.2309 & 0.1949 & 0.2672 & 0.2721 & 0.2288 & 0.2874 & 0.2942 & 0.2588 \\
+ & \texttt{qwen2.5:3b-instruct} & 0.2841 & 0.3085 & 0.1989 & 0.3771 & 0.3954 & 0.2883 & 0.3480 & 0.3720 & 0.2646 \\
+\midrule
+\textbf{Yelp n500} & DistilBERT & 0.0559 & \textbf{0.0396} & \textbf{0.0316} & 0.0198 & 0.0132 & 0.0105 & 0.0676 & 0.0492 & 0.0394 \\
+ & TF--IDF+LR & 0.1581 & 0.1549 & 0.1662 & 0.0452 & 0.0302 & 0.0195 & 0.0954 & 0.0870 & 0.0682 \\
+ & \texttt{phi3.5:latest} & \textbf{0.0360} & 0.0404 & 0.0397 & \textbf{0.0182} & \textbf{0.0095} & \textbf{0.0077} & 0.0548 & 0.0350 & 0.0294 \\
+ & \texttt{qwen2.5:3b-instruct} & 0.0654 & 0.0755 & 0.0741 & 0.0252 & 0.0139 & 0.0153 & \textbf{0.0398} & \textbf{0.0264} & \textbf{0.0244} \\
+\midrule
+\textbf{Yelp n1000} & DistilBERT & 0.0536 & \textbf{0.0372} & \textbf{0.0300} & \textbf{0.0177} & 0.0112 & 0.0083 & 0.0652 & 0.0462 & 0.0377 \\
+ & TF--IDF+LR & 0.1597 & 0.1586 & 0.1647 & 0.0403 & 0.0275 & 0.0204 & 0.0937 & 0.0816 & 0.0707 \\
+ & \texttt{phi3.5:latest} & \textbf{0.0340} & 0.0404 & 0.0385 & 0.0181 & \textbf{0.0100} & \textbf{0.0072} & 0.0552 & 0.0358 & 0.0275 \\
+ & \texttt{qwen2.5:3b-instruct} & 0.0646 & 0.0753 & 0.0765 & 0.0249 & 0.0134 & 0.0135 & \textbf{0.0399} & \textbf{0.0260} & \textbf{0.0227} \\
+\bottomrule
+\end{tabular}
+\end{table*}
