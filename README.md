@@ -2,7 +2,6 @@
 
 [![SSRN Preprint](https://img.shields.io/badge/SSRN-Preprint%207560344-blue.svg)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7560344)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![Replication Status](https://img.shields.io/badge/Replication-100%25%20Verified-success.svg)](reproduce.py)
 
 Official open-source replication package for the research paper:  
@@ -283,10 +282,3 @@ If you use this replication package, dataset splits, or forensic methodology in 
   url={https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7560344}
 }
 ```
-
----
-
-## 8. License
-
-The code in this repository is licensed under the [MIT License](LICENSE).  
-The datasets, annotations, and documentation are licensed under the [Creative Commons Attribution 4.0 International License (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
