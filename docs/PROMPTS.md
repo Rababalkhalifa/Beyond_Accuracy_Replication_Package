@@ -2,6 +2,10 @@
 
 **Scope:** Canonical and diagnostic prompt templates for Frozen Instruction-Tuned LLMs (`qwen2.5:3b-instruct` and `phi3.5:latest`). Extracted verbatim from Appendix A (pp. 35–36) of the manuscript and historical runners.
 
+* **Evaluated Frozen Model Artifacts (Ollama):**
+  * `qwen2.5:3b-instruct` (`digest: 357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b`, `quantization: Q4_K_M`)
+  * `phi3.5:latest` (`digest: 61819fb370a3c1a9be6694869331e5f85f867a079e9271d66cb223acb81d04ba`, `quantization: Q4_0`)
+
 > [!IMPORTANT]
 > **Label Integrity:**
 > * **Climate Stance Classification** strictly evaluates `BELIEVER` versus `DENIER`.

@@ -47,6 +47,16 @@ from sklearn.pipeline import Pipeline
 
 DEFAULT_SPLIT_ROOT = Path("data/splits")
 DEFAULT_MODELS = ["qwen2.5:3b-instruct", "phi3.5:latest"]
+EXPECTED_MODEL_ARTIFACTS = {
+    "qwen2.5:3b-instruct": {
+        "digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "quantization": "Q4_K_M",
+    },
+    "phi3.5:latest": {
+        "digest": "61819fb370a3c1a9be6694869331e5f85f867a079e9271d66cb223acb81d04ba",
+        "quantization": "Q4_0",
+    },
+}
 DEFAULT_ADAPTED = ["tfidf_lr", "distilbert"]
 DEFAULT_PROMPTS = ["p1_minimal", "p3_json_strict", "p5_abstain"]
 CANONICAL_PROMPT = "p3_json_strict"

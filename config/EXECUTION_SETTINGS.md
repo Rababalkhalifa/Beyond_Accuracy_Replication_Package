@@ -12,6 +12,16 @@
 ### A. Evaluated Model Artifacts & Quantization
 Inference was conducted locally using Ollama (`v0.40.13`) under direct API integration. Model weights and quantization levels are extracted directly from the installed Ollama manifests:
 
+```text
+qwen2.5:3b-instruct
+digest: 357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b
+quantization: Q4_K_M
+
+phi3.5:latest
+digest: 61819fb370a3c1a9be6694869331e5f85f867a079e9271d66cb223acb81d04ba
+quantization: Q4_0
+```
+
 | Metric / Attribute | `qwen2.5:3b-instruct` | `phi3.5:latest` |
 | :--- | :--- | :--- |
 | **Exact Ollama Tag** | `qwen2.5:3b-instruct` | `phi3.5:latest` |

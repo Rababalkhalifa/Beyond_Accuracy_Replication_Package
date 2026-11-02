@@ -27,6 +27,15 @@ The primary evaluation runs and local LLM inferences were executed on the follow
 * **Local Server Endpoint:** `http://localhost:11434`
 * **Inference Backend:** `ggml` / `llama.cpp` runner embedded in Ollama
 * **Installed Model Artifacts:**
+  ```text
+  qwen2.5:3b-instruct
+  digest: 357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b
+  quantization: Q4_K_M
+
+  phi3.5:latest
+  digest: 61819fb370a3c1a9be6694869331e5f85f867a079e9271d66cb223acb81d04ba
+  quantization: Q4_0
+  ```
   * `qwen2.5:3b-instruct`:
     - SHA-256 Digest: `357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b`
     - Container Format: GGUF
@@ -45,7 +54,7 @@ The primary evaluation runs and local LLM inferences were executed on the follow
 ## 3. Python Software Stack
 
 ### A. Core Reproduction Stack (Standard Standardized Packages)
-Used for the deterministic reproduction suite (`reproduce.py`, Tables 7–12, Figures 4–5):
+Used for the deterministic reproduction suite (`reproduce.py`, Tables 7–13, Figures 3–6):
 * Python: `>= 3.10`
 * `numpy`: `>= 1.20.0`
 * `scipy`: `>= 1.7.0`

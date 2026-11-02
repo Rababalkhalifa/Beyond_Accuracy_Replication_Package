@@ -33,8 +33,8 @@ Preprint: [SSRN Abstract 7560344](https://papers.ssrn.com/sol3/papers.cfm?abstra
 Selecting a text classifier using a single benchmark score can overlook variation across historical periods and differences in how effectively confidence identifies errors. Building on chronological testing and multidimensional model evaluation, this study compares frozen prompted language models with task-adapted classifiers on Yelp review sentiment and Climate stance classification across **four model architectures**, **two domain tasks**, **five paired sampling seeds (42–46)**, and **three historical evaluation periods** (within-period reference $T_0$, short-distance target $T_1$, and long-distance target $T_2$):
 
 * **Frozen Prompted Local LLMs:**
-  * `qwen2.5:3b-instruct` (Alibaba Cloud, 3.09B parameters, `Q4_K_M` quantization)
-  * `phi3.5:latest` (Microsoft Research, 3.82B parameters, `Q4_0` quantization)
+  * `qwen2.5:3b-instruct` (Alibaba Cloud, 3.09B parameters, quantization: `Q4_K_M`, digest: `357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b`)
+  * `phi3.5:latest` (Microsoft Research, 3.82B parameters, quantization: `Q4_0`, digest: `61819fb370a3c1a9be6694869331e5f85f867a079e9271d66cb223acb81d04ba`)
 * **Task-Adapted Supervised Baselines:**
   * DistilBERT (`distilbert-base-uncased`, Hugging Face, 66M parameters)
   * TF–IDF Logistic Regression (Unigram + Bigram, Sublinear TF, $L_2$ Regularization)
@@ -214,6 +214,16 @@ To re-run the frozen LLMs from scratch, install Ollama and configure the local s
 ## 6. Required Model Tags & Immutable Manifests
 
 The study evaluated exact model tags pulled via Ollama. Weight manifests and quantization parameters were extracted directly from the installed Ollama library:
+
+```text
+qwen2.5:3b-instruct
+digest: 357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b
+quantization: Q4_K_M
+
+phi3.5:latest
+digest: 61819fb370a3c1a9be6694869331e5f85f867a079e9271d66cb223acb81d04ba
+quantization: Q4_0
+```
 
 | Model Tag | Parameters | Quantization | Ollama Manifest Digest (SHA-256) | Native Context |
 | :--- | :---: | :---: | :--- | :---: |
