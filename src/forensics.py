@@ -112,7 +112,7 @@ def class_log_odds_markers(
     for label in labels:
         other = labels[1] if label == labels[0] else labels[0]
         scored = []
-        for token in sorted(vocab):
+        for token in vocab:
             a = counters[label].get(token, 0)
             b = counters[other].get(token, 0)
 
@@ -122,7 +122,7 @@ def class_log_odds_markers(
             )
             scored.append((token, lo))
 
-        scored.sort(key=lambda x: (-x[1], x[0]))
+        scored.sort(key=lambda x: x[1], reverse=True)
         markers[label] = {token for token, _ in scored[:top_k]}
 
     return markers
@@ -228,10 +228,10 @@ def compute_all_forensics(
                 target_df = pd.read_csv(t_path)
 
                 fkey = f"{setting_name}||{target_name}||{seed}"
-                if "text" in within_df.columns and "text" in target_df.columns and within_df["text"].notna().any():
-                    m = compute_condition_forensics(within_df, target_df)
-                elif cached_forensics and fkey in cached_forensics:
+                if cached_forensics and fkey in cached_forensics:
                     m = cached_forensics[fkey]
+                elif "text" in within_df.columns and "text" in target_df.columns and within_df["text"].notna().any():
+                    m = compute_condition_forensics(within_df, target_df)
                 else:
                     raise RuntimeError(
                         f"Condition {fkey} is dehydrated (no 'text' column) and not found in {cache_path.name}. "

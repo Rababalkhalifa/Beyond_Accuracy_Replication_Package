@@ -5,8 +5,8 @@
 [![Replication Status](https://img.shields.io/badge/Replication-100%25%20Verified-success.svg)](reproduce.py)
 
 Official publication and reproduction package for the research paper:  
-**"Beyond Accuracy in Dynamic Sentiment Analysis: Reliability Profiling and Temporal Forensics for Frozen and Adapted Models"**  
-Author: **Rabab Alkhalifa** (*Department of Computer Science, College of Computer Science and Information Technology, Imam Abdulrahman Bin Faisal University, Dammam, Saudi Arabia*)  
+**"Aging Gracefully? Reliability Profiling and Temporal Forensics of Frozen and Adapted Text Classifiers"**  
+Author: **Rabab Alkhalifa** (*Department of Computer Engineering, College of Computer Science and Information Technology, Imam Abdulrahman Bin Faisal University, Dammam, Saudi Arabia*)  
 Preprint: [SSRN Abstract 7560344](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7560344) | DOI: [10.2139/ssrn.7560344](https://doi.org/10.2139/ssrn.7560344)
 
 ---
@@ -30,31 +30,29 @@ Preprint: [SSRN Abstract 7560344](https://papers.ssrn.com/sol3/papers.cfm?abstra
 
 ## 1. Paper Scope & Research Questions
 
-Evaluating natural language processing classifiers strictly on in-domain reference accuracy conceals critical operational vulnerabilities. When models encounter temporally displaced language streams, performance degrades non-uniformly across model families, confidence estimates lose calibration, and prompt formulations alter predictive behavior.
-
-This study conducts a rigorous comparative audit across **four distinct model architectures**, **two domain tasks**, **five random sampling seeds (42–46)**, and **three temporal horizons** (within-period reference $T_0$, short-distance target $T_1$, and long-distance target $T_2$):
+Selecting a text classifier using a single benchmark score can overlook variation across historical periods and differences in how effectively confidence identifies errors. Building on chronological testing and multidimensional model evaluation, this study compares frozen prompted language models with task-adapted classifiers on Yelp review sentiment and Climate stance classification across **four model architectures**, **two domain tasks**, **five paired sampling seeds (42–46)**, and **three historical evaluation periods** (within-period reference $T_0$, short-distance target $T_1$, and long-distance target $T_2$):
 
 * **Frozen Prompted Local LLMs:**
-  * `qwen2.5:3b-instruct` (Alibaba Cloud, 3.1B parameters, `Q4_K_M` quantization)
-  * `phi3.5:latest` (Microsoft Research, 3.8B parameters, `Q4_0` quantization)
+  * `qwen2.5:3b-instruct` (Alibaba Cloud, 3.09B parameters, `Q4_K_M` quantization)
+  * `phi3.5:latest` (Microsoft Research, 3.82B parameters, `Q4_0` quantization)
 * **Task-Adapted Supervised Baselines:**
   * DistilBERT (`distilbert-base-uncased`, Hugging Face, 66M parameters)
   * TF–IDF Logistic Regression (Unigram + Bigram, Sublinear TF, $L_2$ Regularization)
 * **Datasets & Tasks:**
-  * **Climate:** Social media stance classification (`BELIEVER` vs. `DENIER`)
+  * **Climate:** Social-media stance classification (`BELIEVER` vs. `DENIER`)
   * **Yelp:** Consumer review sentiment classification (`POS` vs. `NEG`)
-* **Prompt Formulations:**
-  * `p1_minimal` (minimal task instruction)
-  * `p3_json_strict` (canonical zero-shot JSON format with verbalized confidence)
-  * `p5_abstain` (explicit confidence thresholding with permitted abstention)
+* **Prompt Configurations:**
+  * `p1_minimal` (`Minimal`: basic task-specific classification instructions)
+  * `p3_json_strict` (`Strict-JSON`: canonical classification with explicit JSON structure and verbalized confidence)
+  * `p5_abstain` (`Abstention-aware`: classification with an explicit option to abstain when uncertain while retaining a best-guess label)
 
 ### Core Research Questions Addressed
 
-* **RQ1 (In-Domain Performance):** How do small task-adapted models compare with compact frozen instruction-tuned LLMs when evaluated on temporally matched in-domain test data?
-* **RQ2 (Temporal Robustness & Reliability):** How severely does temporal shift degrade classification accuracy, Macro-F1 ($\Delta_j = \text{MacroF1}(T_j) - \text{MacroF1}(T_0)$), Expected Calibration Error (ECE-10), and confidence-based selective risk ($R_{80}, R_{100}$)?
-* **RQ3 (Prompt Sensitivity & Explicit Abstention):** Does permitting explicit abstention (`p5_abstain`) reduce post-abstention error, and how sensitive are frozen LLMs to prompt variation ($S_{\text{prompt}}$)?
-* **RQ4 (Supervised vs. Verbalized Uncertainty):** How do supervised softmax probabilities compare to LLM verbalized self-reported confidence in selective prediction workflows?
-* **RQ5 (Temporal Forensics):** Can observed empirical performance decay be explained through corpus-level distributional shifts (lexical novelty, base-2 JSD, top-100 term concentration, document length change, vocabulary overlap loss, and class-marker asymmetry)?
+* **RQ1 (Canonical Within-Period Performance):** How do frozen instruction-tuned LLMs and task-adapted supervised baselines compare in canonical within-period predictive performance on Yelp sentiment and Climate stance classification?
+* **RQ2 (Behavior Under Temporal Displacement):** How do canonical predictive performance ($\Delta_j = \text{MacroF1}(T_j) - \text{MacroF1}(T_0)$), calibration (ECE-10), and confidence-based selective risk ($R_{80}, R_{100}$) vary across historical evaluation periods for task-adapted supervised classifiers and frozen prompted LLMs?
+* **RQ3 (Prompt Sensitivity & Explicit Abstention):** How does predictive performance vary across the tested prompt configurations ($S_{\text{prompt}}$), and what explicit-abstention and structured-output-consistency behaviors do the frozen prompted models exhibit at the reference period?
+* **RQ4 (Reliability Trade-Offs Beyond Canonical Performance):** Beyond canonical predictive performance, what reliability trade-offs distinguish the evaluated task-adapted supervised classifiers and frozen prompted LLMs?
+* **RQ5 (Temporal Forensics & Model Response):** What forms of dataset-side temporal movement (lexical novelty, base-2 JSD, top-term concentration change $\Delta C_{100}$, document-length change $\Delta L$, vocabulary-overlap loss, and class-marker asymmetry $A_{\text{marker}}$) accompany performance changes across periods, and how do these movement profiles relate to the behavior of the evaluated models?
 
 ---
 
@@ -65,7 +63,7 @@ The repository is organized to strictly isolate historical experimental executio
 ```text
 Beyond_Accuracy_Replication_Package/
 ├── README.md                      # Academic reproduction guide & equation documentation
-├── reproduce.py                   # Master replication CLI driver (100% self-contained)
+├── reproduce.py                   # Master replication CLI driver (Tables 7-13 & Figures 3-6)
 ├── requirements.txt               # Pinned Python package dependencies
 ├── environment.yml                # Conda environment definition
 │
@@ -79,35 +77,37 @@ Beyond_Accuracy_Replication_Package/
 │   │   ├── prepare_and_audit_splits.py # Verifies split generation & cryptographic parity
 │   │   └── preflight_check.py     # System environment & model availability verification
 │   ├── analysis/                  # Statistical verification, uncertainty & forensics
-│   │   ├── rq2_uncertainty_improved_v2.py # Synchronized document bootstrap for RQ2 contrasts
-│   │   ├── Temporal_coverage_rankings.py  # Risk-coverage ranking inversion engine
+│   │   ├── rq2_uncertainty_improved_v2.py # Synchronized document-cluster bootstrap for Table 11 / Fig 4
+│   │   ├── Temporal_coverage_rankings.py  # Risk-coverage ranking analysis engine
 │   │   ├── Temporal_coverage_rankings.ipynb # Interactive ranking analysis notebook
 │   │   └── rq5_gate*.py           # Three-gate temporal forensics audit pipeline
-│   └── figures/                   # Scripts generating manuscript Figures 4 and 5
-│       ├── rebuild_figure4_corrected.py   # Canonical Figure 4 generator
-│       └── rq5_alt_figure_verified.py     # Canonical Figure 5 generator
+│   └── figures/                   # Preserved figure-generation scripts (Figures 3, 4, 5, 6)
+│       ├── plot_figure3_temporal_no_note.py    # Canonical Figure 3 generator (3x3 risk-coverage)
+│       ├── plot_rq2_uncertainty_contrasts.py   # Canonical Figure 4 generator (11 contrasts)
+│       ├── rebuild_figure4_corrected.py        # Canonical Figure 5 generator (P1/P3/P5 Macro-F1)
+│       └── rq5_alt_figure_verified_v4.py       # Canonical Figure 6 generator (movement vs response)
 │
 ├── config/                        # Verified execution hyperparameters & machine settings
 │   ├── EXECUTION_SETTINGS.md      # Full prose documentation of model & system settings
 │   └── run_settings.json          # Machine-readable JSON runtime parameters
 │
-├── prompts/                       # Exact verbatim prompt templates (No paraphrasing)
+├── prompts/                       # Exact verbatim prompt templates (Manuscript Appendix A)
 │   ├── climate_prompts.txt        # Verbatim P1, P3, P5 prompts for Climate (BELIEVER/DENIER)
 │   ├── yelp_prompts.txt           # Verbatim P1, P3, P5 prompts for Yelp (POS/NEG)
 │   └── prompts.json               # Structured JSON prompts with JSON schemas
 │
 ├── docs/                          # Audit reports, schemas, and methodology documentation
-│   ├── CODE_PROVENANCE.md         # Exhaustive audit of all 41 code files with SHA256 hashes
+│   ├── CODE_PROVENANCE.md         # Exhaustive audit of all preserved code files with SHA256 hashes
 │   ├── DATA.md                    # Data sources, chronological windows, and label mapping
 │   ├── SAMPLING.md                # 5-seed sampling protocol, class quotas, and nested pairing
 │   ├── OUTPUT_SCHEMA.md           # 21-column schema for saved prediction outputs
-│   ├── PAPER_REPRODUCTION_MAP.md  # Detailed mapping for Tables 7–12, Figs 4–5, and contrasts
+│   ├── PAPER_REPRODUCTION_MAP.md  # Detailed mapping for Tables 7–13 and Figures 3–6
 │   ├── ENVIRONMENT.md             # Hardware specifications, OS, and Ollama configuration
 │   └── PROVENANCE_DISCREPANCIES.md# Technical discrepancies, sign conventions, and resolutions
 │
 ├── data/                          # Audited experimental data splits
 │   ├── README.md                  # Split specifications & sampling overview
-│   └── splits/                    # 65 authoritative CSV splits + checksums_sha256.txt
+│   └── splits/                    # 65 dehydrated CSV splits + checksums & descriptor/forensics cache
 │       ├── climate/               # Climate stance splits (seeds 42..46: train, within, short, long)
 │       └── yelp/                  # Yelp sentiment splits (seeds 42..46: train, within, short, long)
 │
@@ -119,28 +119,29 @@ Beyond_Accuracy_Replication_Package/
 │   └── yelp_results_audit.zip                   # Audit manifests & cross-model mapping logs
 │
 ├── src/                           # Pure modular scientific library
-│   ├── metrics.py                 # Equations 1–11: Accuracy, Macro-F1, Deltas, ECE-10, S_prompt
+│   ├── metrics.py                 # Equations 1–11: Accuracy, Macro-F1, Deltas, ECE-10, S_prompt, R(c)
 │   ├── descriptors.py             # Table 7: Language statistics (tokens/doc, vocab, TTR, mass)
 │   ├── forensics.py               # Equations 12–17: Novelty, JSD_2, Delta C100, Delta L, Churn
 │   ├── loader.py                  # Seamless archive reader & prediction cohort extractor
 │   ├── audit.py                   # SHA-256 verification and cross-model ID matching
-│   ├── tables.py                  # Formats LaTeX & CSV for Tables 7–12
-│   └── plotting.py                # High-res vector/bitmap plotting for Figures 4 and 5
+│   ├── tables.py                  # Formats LaTeX & CSV for Tables 7–13
+│   └── plotting.py                # High-res vector/bitmap plotting for Figures 3, 4, 5, and 6
 │
 ├── scripts/                       # Modular standalone execution scripts
 │   ├── run_experiments.py         # End-to-end model execution (DistilBERT, TF-IDF, Ollama)
-│   └── run_table7.py ... run_table12.py # Modular table generation scripts
+│   ├── hydrate_splits.py          # Restores full text from official source corpora or archive
+│   └── run_table7.py ... run_table13.py # Modular table generation scripts
 │
 └── outputs/                       # Regenerated publication tables and figures
-    ├── tables/                    # LaTeX (.tex) and summary (.csv) files for all tables
-    └── figures/                   # Vector (.pdf, .svg) and bitmap (.png) figures
+    ├── tables/                    # LaTeX (.tex) and summary (.csv) files for Tables 7–13
+    └── figures/                   # Vector (.pdf, .svg) and bitmap (.png) files for Figures 3–6
 ```
 
 ---
 
 ## 3. Environment Setup
 
-The primary verification suite (`reproduce.py`) evaluates all 180 experimental conditions, computes confidence intervals, reproduces Tables 7–12, and renders Figures 4–5 directly from the verified prediction cohorts using pure Python and standard scientific packages. It requires no specialized GPU hardware.
+The primary verification suite (`reproduce.py`) evaluates all 180 experimental conditions, verifies the 3,000-replicate cluster-bootstrap intervals, reproduces Tables 7–13, and renders Figures 3–6 directly from the verified prediction cohorts using pure Python and standard scientific packages. It requires no specialized GPU hardware.
 
 ### Option A: Python Virtual Environment (venv)
 ```bash
@@ -170,7 +171,7 @@ conda activate beyond-accuracy
 
 ## 4. Required Python Packages
 
-The package dependencies are pinned in [`requirements.txt`](file:///C:/Research/Beyond_Accuracy_Replication_Package/requirements.txt):
+The package dependencies are pinned in [`requirements.txt`](requirements.txt):
 
 ```text
 # Core Scientific & Reproduction Stack
@@ -225,31 +226,30 @@ ollama pull qwen2.5:3b-instruct
 ollama pull phi3.5:latest
 ```
 
-*Note on Quantization:* Quantization levels (`Q4_K_M` for Qwen2.5 and `Q4_0` for Phi-3.5) are determined by the compiled GGUF model container distributed under the corresponding Ollama tag. See [`config/EXECUTION_SETTINGS.md`](file:///C:/Research/Beyond_Accuracy_Replication_Package/config/EXECUTION_SETTINGS.md) for full metadata.
+*Note on Quantization:* Quantization levels (`Q4_K_M` for Qwen2.5 and `Q4_0` for Phi-3.5) are determined by the compiled GGUF model container distributed under the corresponding Ollama tag. See [`config/EXECUTION_SETTINGS.md`](config/EXECUTION_SETTINGS.md) for full metadata.
 
 ---
 
 ## 7. Data Preparation & Sampling Protocol
 
-Detailed data acquisition, chronological horizons, and sampling specifications are documented in [`docs/DATA.md`](file:///C:/Research/Beyond_Accuracy_Replication_Package/docs/DATA.md) and [`docs/SAMPLING.md`](file:///C:/Research/Beyond_Accuracy_Replication_Package/docs/SAMPLING.md).
+Detailed data acquisition, chronological horizons, and sampling specifications are documented in [`docs/DATA.md`](docs/DATA.md) and [`docs/SAMPLING.md`](docs/SAMPLING.md).
 
-### Chronological Horizons & Splits
-* **Climate Stance:** Social media posts categorized into `BELIEVER` vs. `DENIER`.
-  * Training: Historical partition (2008–2016), 10,000 documents (5,000 per class).
-  * Within-Period Reference ($T_0$): Historical partition held-out, 1,000 documents (500 per class).
-  * Short-Distance Target ($T_1$): Near-future partition (2017), 1,000 documents (500 per class).
-  * Long-Distance Target ($T_2$): Distant partition (2018), 1,000 documents (500 per class).
-* **Yelp Sentiment:** Restaurant and business reviews categorized into `POS` (5 stars) vs. `NEG` (1 star).
-  * Training: In-period partition (2005–2012), 7,000 documents (3,500 per class).
-  * Within-Period Reference ($T_0$): Held-out in-period partition (2005–2012), 2,000 documents (1,000 per class).
-  * Short-Distance Target ($T_1$): Subsequent partition (2013–2015), 2,000 documents (1,000 per class).
-  * Long-Distance Target ($T_2$): Distant partition (2016–2019), 2,000 documents (1,000 per class).
-  * Evaluated under both `n500` (nested 1,000-document subset) and `n1000` (full 2,000-document set).
+### Chronological Horizons & Splits (Manuscript Table 6)
+* **Climate Stance (`Climate n500`):** Social-media posts categorized into `BELIEVER` vs. `DENIER`.
+  * Training (`2007–2009`): 7,000 documents (3,500 per class).
+  * Within-Period Reference ($T_0$, `2010`): 1,000 documents (500 per class).
+  * Short-Distance Target ($T_1$, `2013`): 1,000 documents (500 per class).
+  * Long-Distance Target ($T_2$, `2018–2019`): 1,000 documents (500 per class).
+* **Yelp Sentiment (`Yelp n500` & `Yelp n1000`):** Consumer reviews categorized into `POS` vs. `NEG`.
+  * Training (`2006–2010`): 7,000 documents (3,500 per class).
+  * Within-Period Reference ($T_0$, `2011–2012`): 1,000 documents (`n500`, 500 per class) or 2,000 documents (`n1000`, 1,000 per class).
+  * Short-Distance Target ($T_1$, `2015`): 1,000 documents (`n500`, 500 per class) or 2,000 documents (`n1000`, 1,000 per class).
+  * Long-Distance Target ($T_2$, `2019–2020`): 1,000 documents (`n500`, 500 per class) or 2,000 documents (`n1000`, 1,000 per class).
 
 ### Sampling Seeds, Dehydrated Manifests & Data Availability
-All sampling was performed across five random seeds: `42, 43, 44, 45, 46`. Following standard academic NLP practice for third-party text corpora (and in compliance with the [Yelp Dataset Terms of Use](https://www.yelp.com/dataset) and social-media platform redistribution policies), the 65 CSV files in [`data/splits/`](data/splits/) and the prediction cohorts in [`archives/`](archives/) are distributed in **dehydrated form**: each row records `example_id`, gold `label`, cryptographic text digest (`text_sha256` or `text_sha1`), `token_count`, `char_length`, and temporal metadata, while omitting raw third-party review and post text.
+All sampling was performed across five fixed random seeds: `42, 43, 44, 45, 46`. Following standard academic NLP practice for third-party text corpora (and in compliance with the [Yelp Dataset Terms of Use](https://www.yelp.com/dataset) and social-media platform redistribution policies), the 65 CSV files in [`data/splits/`](data/splits/) and the prediction cohorts in [`archives/`](archives/) are distributed in **dehydrated form**: each row records `example_id`, gold `label`, cryptographic text digest (`text_sha256` or `text_sha1`), `token_count`, `char_length`, and temporal metadata, while omitting raw third-party review and post text.
 
-* **Out-of-the-Box Reproduction (`reproduce.py --all`):** All audits, Tables 7–12, and Figures 4–5 run **100% out-of-the-box** without raw text using the dehydrated split manifests, `data/splits/checksums_sha256.txt`, the prediction archives, and the precomputed non-reconstructible token statistics in `data/splits/forensics_and_descriptors_cache.json`:
+* **Out-of-the-Box Reproduction (`reproduce.py --all`):** All audits, Tables 7–13, and Figures 3–6 run **100% out-of-the-box** without raw text using the dehydrated split manifests, `data/splits/checksums_sha256.txt`, the prediction archives, and the precomputed non-reconstructible token statistics in `data/splits/forensics_and_descriptors_cache.json`:
   ```bash
   python scripts/audit_dataset_splits.py
   python reproduce.py --all
@@ -271,7 +271,7 @@ All sampling was performed across five random seeds: `42, 43, 44, 45, 46`. Follo
 
 To ensure scientific transparency, this repository preserves the exact code that was used or recovered during the research project **without modifying, cleaning up, refactoring, or silently renaming** historical scripts.
 
-Every code artifact is cataloged in [`docs/CODE_PROVENANCE.md`](file:///C:/Research/Beyond_Accuracy_Replication_Package/docs/CODE_PROVENANCE.md) with its exact filename, SHA-256 hash, dataset, model, role, provenance status (A: Historical execution, B: Recovered historical, C: Later reproducibility runner, D: Analysis-only, E: Figure generation), and verification evidence.
+Every code artifact is cataloged in [`docs/CODE_PROVENANCE.md`](docs/CODE_PROVENANCE.md) with its exact filename, SHA-256 hash, dataset, model, role, provenance status (A: Historical execution, B: Recovered historical, C: Later reproducibility runner, D: Analysis-only, E: Figure generation), and verification evidence.
 
 ### Summary of Script Categories
 
@@ -282,21 +282,23 @@ Every code artifact is cataloged in [`docs/CODE_PROVENANCE.md`](file:///C:/Resea
    * `run_paper_models.py`: Unified end-to-end execution pipeline supporting DistilBERT, TF–IDF, and Ollama LLMs with identical prompt logic.
    * `prepare_and_audit_splits.py`: Split generation and verification engine.
 3. **Statistical Analysis & Uncertainty Contrasts (`code/analysis/`):**
-   * `rq2_uncertainty_improved_v2.py`: Focused synchronized document-cluster bootstrap engine generating empirical 95% confidence intervals for all 11 RQ2 contrasts reported in Section 5.2.
-   * `Temporal_coverage_rankings.py` / `.ipynb`: Selective risk-coverage ranking inversion analysis.
+   * `rq2_uncertainty_improved_v2.py`: Focused synchronized document-cluster bootstrap engine generating conditional 95% confidence intervals (3,000 replicates) for all 11 RQ2 contrasts reported in Table 11 and Figure 4.
+   * `Temporal_coverage_rankings.py` / `.ipynb`: Selective risk-coverage ranking analysis.
    * `rq5_gate1_provenance_audit.py`, `rq5_gate2_regenerate_forensics.py`, `rq5_gate3_regenerate_table12_figure5.py`: Three-gate temporal forensics audit pipeline.
 4. **Manuscript Figure Generators (`code/figures/`):**
-   * `rebuild_figure4_corrected.py`: Generates Figure 4 (Selective Risk vs. Coverage Curves).
-   * `rq5_alt_figure_verified.py`: Generates Figure 5 (Temporal Movement Profiles vs. Model Degradation).
+   * `plot_figure3_temporal_no_note.py`: Generates Figure 3 (3×3 Confidence-Based Risk–Coverage Curves Across Historical Evaluation Periods).
+   * `plot_rq2_uncertainty_contrasts.py`: Generates Figure 4 (Exploratory Retained-Error Comparisons for RQ2).
+   * `rebuild_figure4_corrected.py`: Generates Figure 5 (Reference-Period Macro-F1 Across Prompt Configurations).
+   * `rq5_alt_figure_verified_v4.py`: Generates Figure 6 (Temporal Movement Profiles and Model-Performance Changes).
 
-*Unresolved Historical Scripts Notice:* Four earlier intermediate filenames (`sample_and_run_mvbe_climate_revised(6).py`, `sample_and_run_mvbe_climate_revised(4).py`, `sample_and_run_mvbe_sentiment(3).py`, and `run_adapted_matched_baselines(1).py`) are documented in [`code/historical/climate/MISSING_HISTORICAL_FILES.md`](file:///C:/Research/Beyond_Accuracy_Replication_Package/code/historical/climate/MISSING_HISTORICAL_FILES.md). Their exact prompt templates, hyperparameters, and operational logic are preserved in `run_paper_models.py`, `prompts/`, and `config/EXECUTION_SETTINGS.md`.
+*Unresolved Historical Scripts Notice:* Four earlier intermediate filenames (`sample_and_run_mvbe_climate_revised(6).py`, `sample_and_run_mvbe_climate_revised(4).py`, `sample_and_run_mvbe_sentiment(3).py`, and `run_adapted_matched_baselines(1).py`) are documented in [`code/historical/climate/MISSING_HISTORICAL_FILES.md`](code/historical/climate/MISSING_HISTORICAL_FILES.md). Their exact prompt templates (Appendix A.1 and A.2), hyperparameters, and operational logic are preserved verbatim in `prompts/`, `docs/PROMPTS.md`, and `config/EXECUTION_SETTINGS.md`.
 
 ---
 
 ## 9. Execution & Reproduction Commands
 
 ### Master One-Click Reproduction Driver
-To reproduce all paper tables, figures, and audit checks in ~15–25 seconds:
+To reproduce all paper tables (Tables 7–13), figures (Figures 3–6), and audit checks in ~15–25 seconds:
 ```bash
 python reproduce.py --all
 ```
@@ -323,31 +325,33 @@ python code/reproducibility/run_paper_models.py --datasets climate --seeds 42 43
 python code/historical/yelp/sentiment_frozen_and_adapted_v4_7000_3000_MEMORY_SAFE.py
 ```
 
-#### 3. Running the Synchronized Document-Cluster Bootstrap (RQ2 Uncertainty Contrasts)
+#### 3. Recomputing the 3,000-Replicate Synchronized Document-Cluster Bootstrap (Table 11 / Figure 4)
 ```bash
-python code/analysis/rq2_uncertainty_improved_v2.py
+python reproduce.py --table11 --recompute-bootstrap
 ```
 
 ---
 
 ## 10. Table & Figure Reproduction Map
 
-The following table maps every empirical table, figure, and quantitative claim in the manuscript to its reproduction command, script, and output artifact:
+The following table maps every empirical table (Tables 7–13) and figure (Figures 3–6) in the manuscript to its reproduction command, underlying mathematical equations, and output artifact:
 
 | Manuscript Item | Research Question | Underlying Mathematical Equation | CLI Reproduction Command | Output File |
 | :--- | :---: | :---: | :--- | :--- |
 | **Audit** | — | — | `python reproduce.py --audit` | Console report (`PASS: 65/65 splits, 180 conditions`) |
-| **Table 7** | Descriptors | Eq. (1)–(3), Word Regex | `python reproduce.py --table7` | `outputs/tables/Table7_descriptors.tex`<br>`outputs/tables/Table7_descriptors_summary.csv` |
-| **Table 8** | RQ1 | Eq. (4) [Macro-F1], Eq. (5) [Acc], Eq. (9) [ECE] | `python reproduce.py --table8` | `outputs/tables/RQ1_Table8.tex`<br>`outputs/tables/RQ1_Table8.csv` |
-| **Table 9** | RQ2 | Eq. (6) [$\Delta_j = \text{Target} - \text{Ref}$] | `python reproduce.py --table9` | `outputs/tables/RQ2_Table9.tex`<br>`outputs/tables/RQ2_Table9.csv` |
-| **Table 10** | RQ2 | Eq. (9) [ECE], Eq. (11) [$R(c)$ at $c \in \{0.8, 1.0\}$] | `python reproduce.py --table10` | `outputs/tables/RQ2_Table10_temporal_reliability.tex`<br>`outputs/tables/RQ2_verified_seed_metrics.csv` |
-| **Table 11** | RQ3 | Eq. (10) [$S_{\text{prompt}}$], Explicit Abstention $A$ | `python reproduce.py --table11` | `outputs/tables/RQ3_Table11_abstention.tex`<br>`outputs/tables/RQ3_prompt_sensitivity_summary.csv` |
-| **Table 12** | RQ5 | Eq. (12)–(17) [Novelty, JSD$_2$, $\Delta C_{100}$, $\Delta L$, Churn] | `python reproduce.py --table12` | `outputs/tables/RQ5_Table12_temporal_forensics.tex`<br>`outputs/tables/RQ5_Table12_summary.csv` |
-| **Figure 4** | RQ2 / RQ4 | Eq. (11) [Selective Risk $R(c)$ vs. Coverage $c$] | `python reproduce.py --figures` | `outputs/figures/RQ2_coverage_rankings.pdf`<br>`outputs/figures/RQ2_coverage_rankings.svg` |
-| **Figure 5** | RQ5 | Forensic shifts vs. empirical accuracy drop | `python reproduce.py --figures` | `outputs/figures/Figure5_movement_vs_response.pdf`<br>`outputs/figures/Figure5_movement_vs_response.svg` |
-| **RQ2 Contrasts**| RQ2 | Synchronized document-cluster bootstrap (1,000 resamples)| `python code/analysis/rq2_uncertainty_improved_v2.py` | Console report & contrast summary table |
+| **Table 7** | Descriptors | Lowercase Word Regex `\b\w+\b` | `python reproduce.py --table7` | `outputs/tables/Table7_descriptors.tex`<br>`outputs/tables/Table7_descriptors.csv` |
+| **Table 8** | RQ1 | Eq. (1) [Acc], Eq. (5) [Macro-F1], Eq. (9) [ECE] | `python reproduce.py --table8` | `outputs/tables/RQ1_Table8.tex`<br>`outputs/tables/RQ1_Table8.csv` |
+| **Table 9** | RQ2 | Eq. (6) [$\Delta_j = F_1(T_j) - F_1(T_0)$] | `python reproduce.py --table9` | `outputs/tables/RQ2_Table9.tex`<br>`outputs/tables/RQ2_Table9.csv` |
+| **Table 10** | RQ2 | Eq. (9) [ECE], Table 3 [$R(c)$ at $c \in \{0.8, 1.0\}$] | `python reproduce.py --table10` | `outputs/tables/RQ2_Table10_temporal_reliability.tex`<br>`outputs/tables/RQ2_Table10_summary.csv` |
+| **Table 11** | RQ2 | 11 Retained-Error Contrasts (3,000 Bootstrap Replicates) | `python reproduce.py --table11` | `outputs/tables/RQ2_Table11_bootstrap_contrasts.tex`<br>`outputs/tables/RQ2_Table11_bootstrap_contrasts.csv` |
+| **Table 12** | RQ3 | Explicit `Abstention-aware` Abstention & Eq. (10) [$S_{\text{prompt}}$] | `python reproduce.py --table12` | `outputs/tables/RQ3_Table12_abstention.tex`<br>`outputs/tables/RQ3_Table12_summary.csv`<br>`outputs/tables/RQ3_prompt_sensitivity_summary.csv` |
+| **Table 13** | RQ5 | Eq. (12)–(17) [Novelty, JSD$_2$, $\Delta C_{100}$, $\Delta L$, Overlap Loss, $A_{\text{marker}}$] | `python reproduce.py --table13` | `outputs/tables/RQ5_Table13_temporal_forensics.tex`<br>`outputs/tables/RQ5_Table13_summary.csv` |
+| **Figure 3** | RQ2 | 3×3 Confidence-Based Risk–Coverage Curves Across Periods | `python reproduce.py --figures` | `outputs/figures/Figure3_temporal_risk_coverage.pdf`<br>`outputs/figures/Figure3_temporal_risk_coverage.svg` |
+| **Figure 4** | RQ2 | 3-Panel Exploratory Retained-Error Comparisons (11 Contrasts) | `python reproduce.py --figures` | `outputs/figures/Figure4_uncertainty_contrasts.pdf`<br>`outputs/figures/Figure4_uncertainty_contrasts.svg` |
+| **Figure 5** | RQ3 | 3-Panel Reference-Period Macro-F1 Across Prompt Configurations | `python reproduce.py --figures` | `outputs/figures/Figure5_prompt_comparison.pdf`<br>`outputs/figures/Figure5_prompt_comparison.svg` |
+| **Figure 6** | RQ5 | Dual-Panel Temporal Movement Profiles vs. Model Response | `python reproduce.py --figures` | `outputs/figures/Figure6_movement_vs_response.pdf`<br>`outputs/figures/Figure6_movement_vs_response.svg` |
 
-For full tabular breakdowns of the 11 RQ2 bootstrap contrasts and exact numerical comparisons, see [`docs/PAPER_REPRODUCTION_MAP.md`](file:///C:/Research/Beyond_Accuracy_Replication_Package/docs/PAPER_REPRODUCTION_MAP.md).
+For full tabular breakdowns of every manuscript item, see [`docs/PAPER_REPRODUCTION_MAP.md`](docs/PAPER_REPRODUCTION_MAP.md).
 
 ---
 
@@ -358,7 +362,7 @@ When replicating or extending this study, researchers should consider several te
 1. **Non-Deterministic Inference Across GPU Architectures:**  
    Even when setting `temperature=0.0`, `top_p=1.0`, and fixing decode seed `1`, small numerical differences can arise across different GPU hardware architectures, CUDA compute capabilities, and Ollama/llama.cpp backend compilation flags (e.g., AVX2 vs. AVX-512 vs. cuBLAS matrix multiplication order). This floating-point non-associativity can occasionally flip marginal predictions near decision boundaries.
 2. **Exact Model Digest & Quantization Reproducibility:**  
-   Ollama periodically updates model tags when new upstream GGUF revisions are released. Replicating the exact empirical results requires pulling or verifying the exact immutable SHA-256 model digests specified in [Section 6](#6-required-model-tags--immutable-manifests) and [`config/EXECUTION_SETTINGS.md`](file:///C:/Research/Beyond_Accuracy_Replication_Package/config/EXECUTION_SETTINGS.md). Running with unverified model digests or different quantization types (e.g., `Q8_0` or `FP16`) will alter accuracy and latency profiles.
+   Ollama periodically updates model tags when new upstream GGUF revisions are released. Replicating the exact empirical results requires pulling or verifying the exact immutable SHA-256 model digests specified in [Section 6](#6-required-model-tags--immutable-manifests) and [`config/EXECUTION_SETTINGS.md`](config/EXECUTION_SETTINGS.md). Running with unverified model digests or different quantization types (e.g., `Q8_0` or `FP16`) will alter accuracy and latency profiles.
 3. **Input Text Truncation (`MAX_TEXT_CHARS = 800`):**  
    Prompted LLM inference scripts enforced a hard input truncation of the first 800 characters (`text[:800]`) to ensure consistent memory bounds and execution throughput. Removing or altering this character limit on longer reviews will alter token distributions and classification predictions.
 4. **Hardware Constraints (VRAM / RAM):**  
@@ -375,8 +379,8 @@ When replicating or extending this study, researchers should consider several te
 If you use this replication package, dataset splits, or forensic methodology in your research, please cite:
 
 ```bibtex
-@article{alkhalifa2026beyond,
-  title={Beyond Accuracy in Dynamic Sentiment Analysis: Reliability Profiling and Temporal Forensics for Frozen and Adapted Models},
+@article{alkhalifa2026aging,
+  title={Aging Gracefully? Reliability Profiling and Temporal Forensics of Frozen and Adapted Text Classifiers},
   author={Alkhalifa, Rabab},
   journal={SSRN Electronic Journal},
   year={2026},

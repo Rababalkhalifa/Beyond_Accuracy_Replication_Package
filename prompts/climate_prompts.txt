@@ -1,43 +1,64 @@
 ================================================================================
-CLIMATE STANCE CLASSIFICATION PROMPTS
+CLIMATE STANCE CLASSIFICATION PROMPTS (Manuscript Appendix A.1)
 Task: Binary Climate Stance Classification
 Labels: BELIEVER, DENIER
-Canonical Configuration: p3_json_strict
+Canonical Configuration: p3_json_strict (Strict JSON)
 ================================================================================
 
 [SYSTEM PROMPT]
-Follow the classification instructions exactly.
+Follow the user instructions exactly. Output only what is requested.
 
 --------------------------------------------------------------------------------
-[CONFIGURATION: p1_minimal]
-Classify the climate stance of TEXT as BELIEVER or DENIER.
-Return exactly one JSON object with keys label, confidence, abstain.
+[CONFIGURATION: p1_minimal / Minimal]
+You are a climate-stance classifier.
+Return ONLY valid JSON with keys: label, confidence, abstain.
+Allowed labels: BELIEVER, DENIER.
+
 Definitions:
-BELIEVER: accepts, supports, or expresses concern about climate change, climate science, or climate action.
-DENIER: rejects, doubts, mocks, minimizes, or argues against climate change, climate science, or climate action.
-confidence must be between 0 and 1. abstain must be false.
+- BELIEVER: the text accepts, supports, or expresses concern about climate change, climate science, or climate action.
+- DENIER: the text rejects, doubts, mocks, minimizes, or argues against climate change, climate science, or climate action.
+
+confidence MUST be a number between 0 and 1.
+Text: {text}
+
+--------------------------------------------------------------------------------
+[CONFIGURATION: p3_json_strict / Strict JSON] (CANONICAL BENCHMARK)
+Classify the climate stance of TEXT into exactly one label: BELIEVER or DENIER.
+Output MUST be one JSON object on one line. No markdown.
+confidence must be a float in [0,1].
+
+Definitions:
+BELIEVER = accepts, supports, or expresses concern about climate change, climate science, or climate action.
+DENIER = rejects, doubts, mocks, minimizes, or argues against climate change, climate science, or climate action.
+
+Allowed JSON examples:
+{"label":"BELIEVER","confidence":0.9,"abstain":false}
+{"label":"DENIER","confidence":0.9,"abstain":false}
+
 TEXT:
 {text}
 
 --------------------------------------------------------------------------------
-[CONFIGURATION: p3_json_strict] (CANONICAL BENCHMARK)
-Determine the climate stance label for TEXT. Allowed labels are exactly BELIEVER and DENIER.
-Output one JSON object only. Do not add markdown or explanation.
-Definitions:
-BELIEVER: accepts, supports, or expresses concern about climate change, climate science, or climate action.
-DENIER: rejects, doubts, mocks, minimizes, or argues against climate change, climate science, or climate action.
-Use this exact structure: {"label":"BELIEVER","confidence":0.90,"abstain":false}
-confidence must be a number in [0,1]. abstain must be false.
-TEXT:
-{text}
+[CONFIGURATION: p5_abstain / Abstention-aware] (SELECTIVE PREDICTION / ABSTENTION)
+You are a cautious climate-stance classifier.
+Return ONLY one JSON object on one line. No markdown.
+Allowed labels: BELIEVER, DENIER.
 
---------------------------------------------------------------------------------
-[CONFIGURATION: p5_abstain] (SELECTIVE PREDICTION / ABSTENTION)
-Classify the climate stance of TEXT as BELIEVER or DENIER.
-Return one JSON object only with keys label, confidence, abstain.
 Definitions:
-BELIEVER: accepts, supports, or expresses concern about climate change, climate science, or climate action.
-DENIER: rejects, doubts, mocks, minimizes, or argues against climate change, climate science, or climate action.
-Set abstain=true only when the text is genuinely mixed, unclear, or insufficient for a defensible decision. Even when abstaining, provide the best-guess label and confidence no higher than 0.50.
+BELIEVER = accepts, supports, or expresses concern about climate change, climate science, or climate action.
+DENIER = rejects, doubts, mocks, minimizes, or argues against climate change, climate science, or climate action.
+
+Use this exact JSON shape:
+{"label":"BELIEVER","confidence":0.0,"abstain":true}
+
+If the text is mixed, sarcastic, unclear, only quotes someone else's stance without endorsing it, or is not clearly about climate stance:
+- set abstain=true
+- still provide your best-guess label
+- confidence <= 0.5
+
+If confident:
+- set abstain=false
+- confidence closer to 1.
+
 TEXT:
 {text}

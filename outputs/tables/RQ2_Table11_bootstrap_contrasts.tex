@@ -1,0 +1,26 @@
+\begin{table*}[t]
+\centering
+\footnotesize
+\caption{Focused retained-error differences across evaluated historical cohorts. Differences are five-seed means in percentage points (pp). Conditional 95\% intervals use 3,000 synchronized document-cluster bootstrap resamples conditional on the archived models, fixed seeds, and evaluated splits; intervals are not adjusted for multiple comparisons.}
+\label{tab:rq2-bootstrap-contrasts}
+\begin{tabular}{lllrrrrr}
+\toprule
+\textbf{Setting} & \textbf{Period} & \textbf{Contrast} & \textbf{Diff. (pp)} & \textbf{95\% CI (pp)} & \textbf{Seed SD} & \textbf{Seed signs} & \textbf{Clusters} \\
+\midrule
+Yelp n500 & Reference & Phi - Qwen at 80% & -0.701 & [-1.185, -0.237] & 0.554 & 5 neg. & 4,882 \\
+Yelp n500 & Short & Phi - Qwen at 80% & -0.441 & [-0.788, -0.085] & 0.404 & 5 neg. & 4,889 \\
+Yelp n500 & Long & Phi - Qwen at 80% & -0.762 & [-1.098, -0.447] & 0.461 & 5 neg. & 4,900 \\
+\midrule
+Yelp n1000 & Reference & Phi - Qwen at 80% & -0.674 & [-1.027, -0.338] & 0.599 & 5 neg. & 9,553 \\
+Yelp n1000 & Short & Phi - Qwen at 80% & -0.343 & [-0.596, -0.084] & 0.171 & 5 neg. & 9,563 \\
+Yelp n1000 & Long & Phi - Qwen at 80% & -0.630 & [-0.874, -0.403] & 0.108 & 5 neg. & 9,581 \\
+\midrule
+Climate n500 & Reference & Qwen 80% - 100% & +2.912 & [+2.376, +3.461] & 0.217 & 5 pos. & 4,724 \\
+Climate n500 & Short & Qwen 80% - 100% & +2.343 & [+1.742, +2.927] & 0.500 & 5 pos. & 4,737 \\
+Climate n500 & Long & Qwen 80% - 100% & +2.374 & [+1.890, +2.909] & 0.336 & 5 pos. & 4,449 \\
+\midrule
+Climate n500 & Short - Ref. & DistilBERT at 80% & +3.125 & [+1.947, +4.218] & 0.500 & 5 pos. & 9,461 \\
+Climate n500 & Long - Ref. & DistilBERT at 80% & +1.975 & [+0.798, +3.114] & 0.863 & 5 pos. & 9,173 \\
+\bottomrule
+\end{tabular}
+\end{table*}

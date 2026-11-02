@@ -1,8 +1,12 @@
-"""Publication figure generation for risk-coverage curves and model rankings.
-
-Reproduces Figure: 'Coverage changes the model ranking' in SVG, PDF, and PNG formats.
+"""Publication figure generation for the manuscript:
+- Figure 3: 3x3 Confidence-based risk-coverage curves across historical evaluation periods
+- Figure 4: 3-panel Exploratory retained-error comparisons for RQ2 (11 cluster-bootstrap contrasts)
+- Figure 5: 3-panel Reference-period Macro-F1 across prompt configurations (P1, P3, P5)
+- Figure 6: Dual-panel Temporal movement profiles and corresponding model-performance changes
+- Supplemental: Within-period risk-coverage and model ranking plot (RQ2_coverage_rankings)
 """
 
+import statistics
 from collections import defaultdict
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
@@ -17,10 +21,235 @@ from matplotlib.ticker import PercentFormatter
 
 SEEDS = range(42, 47)
 SETTINGS = ("Climate n500", "Yelp n500", "Yelp n1000")
+PERIODS = ("within", "short", "long")
 MODELS = ("distilbert", "tfidf_lr", "phi3.5:latest", "qwen2.5:3b-instruct")
 DISPLAY = ("DistilBERT", "TF-IDF+LR", "phi3.5:latest", "qwen2.5:3b-instruct")
 COLORS = ("#0072B2", "#72777F", "#009E73", "#D55E00")
 MARKERS = ("o", "s", "^", "D")
+
+
+def plot_figure3_temporal_risk_coverage(
+    risk_rows: Sequence[Dict[str, any]],
+    out_dir: Union[str, Path],
+    filename_stem: str = "Figure3_temporal_risk_coverage"
+) -> List[Path]:
+    """Generate manuscript Figure 3: 3x3 temporal risk-coverage curves across periods and settings."""
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    curve = {}
+    for r in risk_rows:
+        pct = int(round(float(r["coverage"]) * 100))
+        curve[r["setting"], r["model"], r["period"], int(r["seed"]), pct] = float(r["expected_risk"])
+
+    plt.rcParams.update({
+        "font.family": "DejaVu Sans", "font.size": 9,
+        "axes.labelsize": 9, "axes.titlesize": 10,
+        "xtick.labelsize": 8.5, "ytick.labelsize": 8.5,
+        "legend.fontsize": 9, "svg.fonttype": "none", "pdf.fonttype": 42,
+        "axes.spines.top": False, "axes.spines.right": False,
+        "axes.edgecolor": "#CBD2D8", "savefig.facecolor": "white",
+    })
+    fig, axs = plt.subplots(3, 3, figsize=(11.4, 8.2), sharex=False, sharey="row")
+    fig.subplots_adjust(left=.105, right=.985, top=.88, bottom=.095, wspace=.32, hspace=.43)
+
+    period_titles = {"within": "Reference", "short": "Short", "long": "Long"}
+    row_titles = [
+        "Climate stance\nn = 500 per class",
+        "Yelp sentiment\nn = 500 per class",
+        "Yelp sentiment\nn = 1,000 per class"
+    ]
+    label_map = {
+        "distilbert": "DistilBERT",
+        "tfidf_lr": "TF–IDF+LR",
+        "phi3.5:latest": "Phi",
+        "qwen2.5:3b-instruct": "Qwen"
+    }
+    color_map = {
+        "distilbert": "#176FAD",
+        "tfidf_lr": "#626A75",
+        "phi3.5:latest": "#08896B",
+        "qwen2.5:3b-instruct": "#CB5900"
+    }
+    marker_map = dict(zip(MODELS, ("o", "s", "^", "D")))
+    coverages = tuple(range(20, 101))
+
+    for i, setting in enumerate(SETTINGS):
+        for j, period in enumerate(PERIODS):
+            ax = axs[i, j]
+            ax.set_title(period_titles[period], loc="left", fontweight="bold", pad=8)
+            ax.set_xlim(20, 100)
+            ax.set_ylim(0, 45 if i == 0 else 12.5)
+            ax.set_xticks((20, 40, 60, 80, 100))
+            ax.xaxis.set_major_formatter(PercentFormatter(xmax=100, decimals=0))
+            ax.yaxis.set_major_formatter(PercentFormatter(xmax=100, decimals=0))
+            ax.grid(axis="y", color="#E7ECF1", linewidth=.7)
+            ax.axvline(80, color="#BFC6CC", linewidth=.9, linestyle=":", zorder=1)
+            if i == 2:
+                ax.set_xlabel("Coverage retained")
+            if j == 0:
+                ax.set_ylabel("Retained error")
+                ax.annotate(row_titles[i], xy=(-.36, .5), xycoords="axes fraction",
+                            ha="center", va="center", rotation=90, fontweight="bold", fontsize=9)
+            for model in MODELS:
+                samples = [[curve[setting, model, period, seed, pct] * 100
+                            for seed in sorted(SEEDS)] for pct in coverages]
+                means = [statistics.mean(values) for values in samples]
+                sds = [statistics.stdev(values) for values in samples]
+                ax.fill_between(coverages,
+                                [max(0, m - sd) for m, sd in zip(means, sds)],
+                                [m + sd for m, sd in zip(means, sds)],
+                                color=color_map[model], alpha=.12, linewidth=0)
+                ax.plot(coverages, means, color=color_map[model], lw=1.85, linestyle="-", zorder=3)
+                for pct in (60, 80, 95, 100):
+                    ax.plot(pct, means[pct - 20], marker=marker_map[model],
+                            color=color_map[model], markersize=3.8,
+                            markeredgecolor="white", markeredgewidth=.4, zorder=4)
+
+    handles = [Line2D([0], [0], color=color_map[m], marker=marker_map[m],
+                      linestyle="-", lw=1.9, markersize=5, label=label_map[m])
+               for m in MODELS]
+    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(.54, .985),
+               ncol=4, frameon=False, columnspacing=1.8, handlelength=2.5)
+
+    saved_paths = []
+    for stem in (filename_stem, "RQ2_temporal_risk_coverage"):
+        for ext in ("pdf", "svg", "png"):
+            p = out / f"{stem}.{ext}"
+            fig.savefig(p, dpi=300 if ext == "png" else None, facecolor="white")
+            if stem == filename_stem:
+                saved_paths.append(p)
+    plt.close(fig)
+    return saved_paths
+
+
+def plot_figure4_uncertainty_contrasts(
+    contrast_rows: Sequence[Dict[str, any]],
+    out_dir: Union[str, Path],
+    filename_stem: str = "Figure4_uncertainty_contrasts"
+) -> List[Path]:
+    """Generate manuscript Figure 4: 3-panel exploratory retained-error comparisons for RQ2."""
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    period_labels = {"within": "Reference", "short": "Short", "long": "Long"}
+    sections = [
+        ("A  Yelp: Phi minus Qwen at 80%", "#1875A5",
+         [("Yelp n500", "within", "phi_minus_qwen_at_80", "n500 · Reference"),
+          ("Yelp n500", "short", "phi_minus_qwen_at_80", "n500 · Short"),
+          ("Yelp n500", "long", "phi_minus_qwen_at_80", "n500 · Long"),
+          ("Yelp n1000", "within", "phi_minus_qwen_at_80", "n1000 · Reference"),
+          ("Yelp n1000", "short", "phi_minus_qwen_at_80", "n1000 · Short"),
+          ("Yelp n1000", "long", "phi_minus_qwen_at_80", "n1000 · Long")]),
+        ("B  Climate: Qwen 80% minus 100%", "#C16A23",
+         [("Climate n500", p, "qwen_80_minus_100", period_labels[p])
+          for p in ("within", "short", "long")]),
+        ("C  Climate: DistilBERT temporal change", "#17835D",
+         [("Climate n500", "short", "distilbert_period_minus_reference_at_80", "Short − Reference"),
+          ("Climate n500", "long", "distilbert_period_minus_reference_at_80", "Long − Reference")])
+    ]
+
+    lookup = {
+        (r["setting"], r["period"], r["contrast"]): (
+            float(r["mean_difference_pp"]),
+            float(r["ci_95_low_pp"]),
+            float(r["ci_95_high_pp"])
+        )
+        for r in contrast_rows
+    }
+
+    fig, axes = plt.subplots(1, 3, figsize=(13.6, 5.2), gridspec_kw={"width_ratios": [1.55, 1, 0.9]})
+    for ax, (title, color, items) in zip(axes, sections):
+        values = np.array([lookup[(setting, period, contrast)] for setting, period, contrast, _ in items])
+        x, lo, hi = values.T
+        y = np.arange(len(items))[::-1]
+        ax.errorbar(x, y, xerr=[x - lo, hi - x], fmt="o", markersize=5.8, color=color,
+                    ecolor=color, elinewidth=1.5, capsize=3, zorder=3)
+        ax.axvline(0, color="#5C646E", linewidth=1, linestyle="--")
+        ax.set_yticks(y, [label for *_, label in items], fontsize=9)
+        ax.set_title(title, fontsize=10.5, loc="left", weight="bold", pad=12)
+        ax.grid(axis="x", alpha=.2)
+        ax.set_axisbelow(True)
+        ax.tick_params(axis="x", labelsize=9)
+        for spine in ("top", "right", "left"):
+            ax.spines[spine].set_visible(False)
+        ax.set_ylim(-.65, len(items) - .35)
+        ax.set_xlabel("Retained-error difference (percentage points)", fontsize=9)
+        ax.set_xlim(min(lo.min() - .2, -.2), max(hi.max() + .2, .2))
+
+    fig.subplots_adjust(left=.13, right=.99, top=.81, bottom=.19, wspace=.43)
+
+    saved_paths = []
+    for stem in (filename_stem, "RQ2_uncertainty_contrasts"):
+        for ext in ("pdf", "svg", "png"):
+            p = out / f"{stem}.{ext}"
+            fig.savefig(p, bbox_inches="tight", dpi=240 if ext == "png" else None, facecolor="white")
+            if stem == filename_stem:
+                saved_paths.append(p)
+    plt.close(fig)
+    return saved_paths
+
+
+def plot_figure5_prompt_comparison(
+    prompt_summary_rows: Sequence[Dict[str, any]],
+    out_dir: Union[str, Path],
+    filename_stem: str = "Figure5_prompt_comparison"
+) -> List[Path]:
+    """Generate manuscript Figure 5: Reference-period Macro-F1 across prompt configurations (P1, P3, P5)."""
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    prompts = ["p1_minimal", "p3_json_strict", "p5_abstain"]
+    frozen_models = [("phi3.5:latest", "Phi", "o"), ("qwen2.5:3b-instruct", "Qwen", "s")]
+    lookup = {(r["setting"], r["model"], r["prompt"]): r for r in prompt_summary_rows}
+
+    plt.rcParams.update({
+        "font.family": "DejaVu Sans",
+        "font.size": 11,
+        "svg.fonttype": "none",
+        "pdf.fonttype": 42
+    })
+
+    fig, axes = plt.subplots(1, 3, figsize=(12.5, 3.8))
+    for ax, setting in zip(axes, SETTINGS):
+        for model_id, model_label, marker in frozen_models:
+            means = [float(lookup[(setting, model_id, p)]["macro_f1_mean"]) for p in prompts]
+            sds = [float(lookup[(setting, model_id, p)]["macro_f1_sd"]) for p in prompts]
+            ax.errorbar(
+                range(3),
+                means,
+                yerr=sds,
+                marker=marker,
+                linewidth=1.7,
+                markersize=6,
+                capsize=4,
+                label=model_label
+            )
+
+        ax.set_title(setting)
+        ax.set_ylabel("Macro-F1")
+        ax.set_xticks(range(3), ["P1", "P3", "P5"])
+        if setting == "Climate n500":
+            ax.set_ylim(0.54, 0.74)
+        else:
+            ax.set_ylim(0.925, 0.98)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.grid(axis="y", alpha=0.22)
+
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=2, frameon=False)
+    fig.tight_layout(rect=(0, 0, 1, 0.88))
+
+    saved_paths = []
+    for stem in (filename_stem, "Figure4_prompt_comparison_corrected"):
+        for ext in ("pdf", "svg", "png"):
+            p = out / f"{stem}.{ext}"
+            fig.savefig(p, dpi=300 if ext == "png" else None, bbox_inches="tight", facecolor="white")
+            if stem == filename_stem:
+                saved_paths.append(p)
+    plt.close(fig)
+    return saved_paths
 
 
 def plot_coverage_and_rankings(
@@ -28,7 +257,7 @@ def plot_coverage_and_rankings(
     out_dir: Union[str, Path],
     filename_stem: str = "RQ2_coverage_rankings"
 ) -> List[Path]:
-    """Generate high-resolution multi-panel risk vs. coverage and ranking figure."""
+    """Generate high-resolution multi-panel within-period risk vs. coverage and ranking figure."""
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
@@ -147,13 +376,13 @@ def plot_coverage_and_rankings(
     return saved_paths
 
 
-def plot_figure5_movement_vs_response(
+def plot_figure6_movement_vs_response(
     forensics_rows: Sequence[Dict[str, any]],
     delta_rows: Sequence[Dict[str, any]],
     out_dir: Union[str, Path],
-    filename_stem: str = "Figure5_movement_vs_response"
+    filename_stem: str = "Figure6_movement_vs_response"
 ) -> List[Path]:
-    """Generate publication Figure 5: Movement vs. Response dual-panel heatmap."""
+    """Generate manuscript Figure 6: Movement vs. Response dual-panel heatmap."""
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
@@ -190,10 +419,8 @@ def plot_figure5_movement_vs_response(
     }
     metric_names = list(metric_cols.keys())
 
-    # Map forensics rows
     rq5_map = {(r["dataset_setting"], r["target"]): r for r in forensics_rows}
 
-    # Format annotations and relative intensities
     def format_forensic_value(metric, value):
         if metric == "Δ length":
             return f"↑ {abs(value):.1f}" if value > 0 else (f"↓ {abs(value):.1f}" if value < 0 else "0.0")
@@ -223,7 +450,6 @@ def plot_figure5_movement_vs_response(
     heat_a = np.array(heat_a)
     row_labels = [f"{dataset}\n{target.capitalize()}" for dataset, target in condition_order]
 
-    # Panel B Response Matrix
     delta_map = {(r["dataset_setting"], r["target"], r["model"]): r for r in delta_rows}
     response_matrix = np.zeros((len(condition_order), len(model_order)))
 
@@ -231,7 +457,6 @@ def plot_figure5_movement_vs_response(
         for j, model in enumerate(model_order):
             if (setting, target, model) in delta_map:
                 row = delta_map[setting, target, model]
-                # Check for either delta_macro_f1_mean or delta_short/delta_long
                 if "delta_macro_f1_mean" in row:
                     val = float(row["delta_macro_f1_mean"])
                 elif target == "short" and "delta_short" in row:
@@ -244,7 +469,6 @@ def plot_figure5_movement_vs_response(
 
     response_limit = float(np.max(np.abs(response_matrix))) if np.max(np.abs(response_matrix)) > 0 else 0.1
 
-    # Plot dual-panel figure
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(17, 9), gridspec_kw={"width_ratios": [1.25, 0.95], "wspace": 0.28})
 
     im1 = ax1.imshow(heat_a, aspect="auto", cmap="YlOrRd", vmin=0, vmax=1)
@@ -301,10 +525,16 @@ def plot_figure5_movement_vs_response(
     fig.suptitle("Temporal movement profiles and corresponding model-performance changes", fontsize=17, fontweight="bold", y=0.98)
 
     saved_paths = []
-    for ext in ("svg", "pdf", "png"):
-        p = out / f"{filename_stem}.{ext}"
-        fig.savefig(p, dpi=220, facecolor="white", bbox_inches="tight")
-        saved_paths.append(p)
+    for stem in (filename_stem, "Figure5_movement_vs_response"):
+        for ext in ("svg", "pdf", "png"):
+            p = out / f"{stem}.{ext}"
+            fig.savefig(p, dpi=220, facecolor="white", bbox_inches="tight")
+            if stem == filename_stem:
+                saved_paths.append(p)
     plt.close(fig)
 
     return saved_paths
+
+
+# Backwards-compatible alias
+plot_figure5_movement_vs_response = plot_figure6_movement_vs_response

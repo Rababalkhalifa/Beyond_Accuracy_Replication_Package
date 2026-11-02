@@ -591,482 +591,362 @@
     "Climate n500||short||42": {
       "lexical_novelty": 0.6408930669800235,
       "js_divergence": 0.2923906229973234,
-      "top100_mass_change": 0.03047261525321021,
+      "top100_mass_change": 0.0304726152532102,
       "mean_length_change": -0.9929999999999986,
       "overlap_loss": 0.7936807993518769,
-      "class_marker_asymmetry": 0.005812263876780022,
+      "class_marker_asymmetry": 0.00581226387678,
       "labels": [
         "BELIEVER",
         "DENIER"
-      ],
-      "churn": {
-        "BELIEVER": 0.9247311827956989,
-        "DENIER": 0.9189189189189189
-      }
+      ]
     },
     "Climate n500||short||43": {
       "lexical_novelty": 0.6382038157282457,
-      "js_divergence": 0.29251141856324575,
-      "top100_mass_change": 0.040590152743719465,
+      "js_divergence": 0.2925114185632457,
+      "top100_mass_change": 0.0405901527437194,
       "mean_length_change": -1.2219999999999978,
       "overlap_loss": 0.7925283522348232,
       "class_marker_asymmetry": 0.016709368385875,
       "labels": [
         "BELIEVER",
         "DENIER"
-      ],
-      "churn": {
-        "BELIEVER": 0.9528795811518325,
-        "DENIER": 0.9361702127659575
-      }
+      ]
     },
     "Climate n500||short||44": {
       "lexical_novelty": 0.6200578592092575,
       "js_divergence": 0.2816709886088634,
-      "top100_mass_change": 0.03911275063938702,
+      "top100_mass_change": 0.039112750639387,
       "mean_length_change": -1.1229999999999976,
       "overlap_loss": 0.7854614756329976,
-      "class_marker_asymmetry": 0.06399069226294363,
+      "class_marker_asymmetry": 0.0687029456387942,
       "labels": [
         "BELIEVER",
         "DENIER"
-      ],
-      "churn": {
-        "BELIEVER": 0.9528795811518325,
-        "DENIER": 0.8888888888888888
-      }
+      ]
     },
     "Climate n500||short||45": {
       "lexical_novelty": 0.6327116212338594,
       "js_divergence": 0.2923487175144391,
-      "top100_mass_change": 0.044843575597380614,
+      "top100_mass_change": 0.0448435755973806,
       "mean_length_change": -1.216000000000001,
       "overlap_loss": 0.79279643868879,
-      "class_marker_asymmetry": 0.03899938715248763,
+      "class_marker_asymmetry": 0.0332492865257266,
       "labels": [
         "BELIEVER",
         "DENIER"
-      ],
-      "churn": {
-        "BELIEVER": 0.9637305699481865,
-        "DENIER": 0.9247311827956989
-      }
+      ]
     },
     "Climate n500||short||46": {
       "lexical_novelty": 0.6303284416491963,
-      "js_divergence": 0.28816637093303543,
-      "top100_mass_change": 0.04376779394499575,
+      "js_divergence": 0.2881663709330354,
+      "top100_mass_change": 0.0437677939449957,
       "mean_length_change": -0.884999999999998,
       "overlap_loss": 0.7888223552894211,
-      "class_marker_asymmetry": 0.018015853951477312,
+      "class_marker_asymmetry": 0.0297035584863065,
       "labels": [
         "BELIEVER",
         "DENIER"
-      ],
-      "churn": {
-        "BELIEVER": 0.9130434782608696,
-        "DENIER": 0.8950276243093923
-      }
+      ]
     },
     "Climate n500||long||42": {
       "lexical_novelty": 0.7259963768115942,
       "js_divergence": 0.3330079095145607,
-      "top100_mass_change": -0.006841308579974892,
+      "top100_mass_change": -0.0068413085799748,
       "mean_length_change": 8.411999999999999,
       "overlap_loss": 0.8087057335581788,
-      "class_marker_asymmetry": 0.01782001782001774,
+      "class_marker_asymmetry": 0.0231267345050878,
       "labels": [
         "BELIEVER",
         "DENIER"
-      ],
-      "churn": {
-        "BELIEVER": 0.9189189189189189,
-        "DENIER": 0.9010989010989011
-      }
+      ]
     },
     "Climate n500||long||43": {
       "lexical_novelty": 0.7152187120291617,
-      "js_divergence": 0.33286340956273514,
-      "top100_mass_change": -0.005828670946873671,
+      "js_divergence": 0.3328634095627351,
+      "top100_mass_change": -0.0058286709468736,
       "mean_length_change": 8.364,
       "overlap_loss": 0.8018179896416869,
-      "class_marker_asymmetry": 0.00556947925368978,
+      "class_marker_asymmetry": 0.0111982082866741,
       "labels": [
         "BELIEVER",
         "DENIER"
-      ],
-      "churn": {
-        "BELIEVER": 0.9417989417989419,
-        "DENIER": 0.9473684210526316
-      }
+      ]
     },
     "Climate n500||long||44": {
       "lexical_novelty": 0.7083902291002883,
-      "js_divergence": 0.32780087552344334,
-      "top100_mass_change": -0.007603843840669533,
+      "js_divergence": 0.3278008755234433,
+      "top100_mass_change": -0.0076038438406695,
       "mean_length_change": 7.963000000000001,
       "overlap_loss": 0.7964629884570582,
-      "class_marker_asymmetry": 0.011562364503540978,
+      "class_marker_asymmetry": 0.0,
       "labels": [
         "BELIEVER",
         "DENIER"
-      ],
-      "churn": {
-        "BELIEVER": 0.9304812834224598,
-        "DENIER": 0.9189189189189189
-      }
+      ]
     },
     "Climate n500||long||45": {
       "lexical_novelty": 0.7242619511464109,
       "js_divergence": 0.3369049716770187,
-      "top100_mass_change": -0.0059085314309643144,
+      "top100_mass_change": -0.0059085314309643,
       "mean_length_change": 8.114999999999998,
       "overlap_loss": 0.8083333333333333,
-      "class_marker_asymmetry": 0.03360215053763449,
+      "class_marker_asymmetry": 0.0223982977293726,
       "labels": [
         "BELIEVER",
         "DENIER"
-      ],
-      "churn": {
-        "BELIEVER": 0.9247311827956989,
-        "DENIER": 0.9583333333333334
-      }
+      ]
     },
     "Climate n500||long||46": {
       "lexical_novelty": 0.7146341463414634,
-      "js_divergence": 0.3310459809948648,
-      "top100_mass_change": -0.005079409644002386,
+      "js_divergence": 0.3310459809948649,
+      "top100_mass_change": -0.0050794096440023,
       "mean_length_change": 7.615000000000002,
       "overlap_loss": 0.8028851216173528,
-      "class_marker_asymmetry": 0.021931628149244653,
+      "class_marker_asymmetry": 0.0055694792536897,
       "labels": [
         "BELIEVER",
         "DENIER"
-      ],
-      "churn": {
-        "BELIEVER": 0.9637305699481865,
-        "DENIER": 0.9417989417989419
-      }
+      ]
     },
     "Yelp n500||short||42": {
-      "lexical_novelty": 0.38570618264322176,
-      "js_divergence": 0.058384306169203246,
-      "top100_mass_change": 0.0009559548652313676,
+      "lexical_novelty": 0.3857061826432217,
+      "js_divergence": 0.0583843061692032,
+      "top100_mass_change": 0.0009559548652313,
       "mean_length_change": -22.69099999999999,
       "overlap_loss": 0.5949584860498167,
-      "class_marker_asymmetry": 0.03899938715248763,
+      "class_marker_asymmetry": 0.0501532460295347,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.9247311827956989,
-        "POS": 0.9637305699481865
-      }
+      ]
     },
     "Yelp n500||short||43": {
-      "lexical_novelty": 0.37250580046403714,
-      "js_divergence": 0.05829197937974583,
-      "top100_mass_change": 0.005152318825246582,
+      "lexical_novelty": 0.3725058004640371,
+      "js_divergence": 0.0582919793797458,
+      "top100_mass_change": 0.0051523188252465,
       "mean_length_change": -24.858999999999995,
       "overlap_loss": 0.597664385599524,
-      "class_marker_asymmetry": 0.02727322314951175,
+      "class_marker_asymmetry": 0.0438776909365145,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.9417989417989419,
-        "POS": 0.9690721649484536
-      }
+      ]
     },
     "Yelp n500||short||44": {
-      "lexical_novelty": 0.38549750955635353,
-      "js_divergence": 0.060598353396604306,
-      "top100_mass_change": 0.001929588821747541,
+      "lexical_novelty": 0.3854975095563535,
+      "js_divergence": 0.0605983533966043,
+      "top100_mass_change": 0.0019295888217475,
       "mean_length_change": -18.585000000000008,
       "overlap_loss": 0.5930187955504411,
-      "class_marker_asymmetry": 0.04026459591601961,
+      "class_marker_asymmetry": 0.0281483983561335,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.907103825136612,
-        "POS": 0.9473684210526316
-      }
+      ]
     },
     "Yelp n500||short||45": {
       "lexical_novelty": 0.3845798707294552,
-      "js_divergence": 0.058347556054282775,
-      "top100_mass_change": 0.005969808283997624,
+      "js_divergence": 0.0583475560542827,
+      "top100_mass_change": 0.0059698082839976,
       "mean_length_change": -27.613,
       "overlap_loss": 0.597432993582484,
-      "class_marker_asymmetry": 0.057851956842440155,
+      "class_marker_asymmetry": 0.0462695199537305,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.8950276243093923,
-        "POS": 0.9528795811518325
-      }
+      ]
     },
     "Yelp n500||short||46": {
-      "lexical_novelty": 0.37321637426900584,
-      "js_divergence": 0.05921629206673226,
-      "top100_mass_change": 0.0017147023699015662,
+      "lexical_novelty": 0.3732163742690058,
+      "js_divergence": 0.0592162920667322,
+      "top100_mass_change": 0.0017147023699015,
       "mean_length_change": -28.38600000000001,
       "overlap_loss": 0.5987871528037734,
-      "class_marker_asymmetry": 0.011198208286674172,
+      "class_marker_asymmetry": 0.016709368385875,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.9361702127659575,
-        "POS": 0.9473684210526316
-      }
+      ]
     },
     "Yelp n500||long||42": {
       "lexical_novelty": 0.375,
-      "js_divergence": 0.06704304230817247,
-      "top100_mass_change": 0.0026706425682300194,
+      "js_divergence": 0.0670430423081724,
+      "top100_mass_change": 0.00267064256823,
       "mean_length_change": -35.02299999999998,
       "overlap_loss": 0.6088592046675879,
-      "class_marker_asymmetry": 0.05015324602953475,
+      "class_marker_asymmetry": 0.0501532460295347,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.9189189189189189,
-        "POS": 0.9690721649484536
-      }
+      ]
     },
     "Yelp n500||long||43": {
       "lexical_novelty": 0.3632648005945009,
       "js_divergence": 0.0671080984023414,
-      "top100_mass_change": 0.004837871300264696,
-      "mean_length_change": -37.331999999999994,
+      "top100_mass_change": 0.0048378713002646,
+      "mean_length_change": -37.332,
       "overlap_loss": 0.6095245328877412,
-      "class_marker_asymmetry": 0.0486013608381034,
+      "class_marker_asymmetry": 0.0434216239687363,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.9361702127659575,
-        "POS": 0.9847715736040609
-      }
+      ]
     },
     "Yelp n500||long||44": {
-      "lexical_novelty": 0.37913927818429866,
+      "lexical_novelty": 0.3791392781842986,
       "js_divergence": 0.0676188692011058,
-      "top100_mass_change": 0.004273177679958384,
+      "top100_mass_change": 0.0042731776799583,
       "mean_length_change": -29.977000000000004,
       "overlap_loss": 0.6078031964901285,
-      "class_marker_asymmetry": 0.028148398356133586,
+      "class_marker_asymmetry": 0.0339606622329136,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.9247311827956989,
-        "POS": 0.9528795811518325
-      }
+      ]
     },
     "Yelp n500||long||45": {
       "lexical_novelty": 0.3735481453727988,
-      "js_divergence": 0.06837653153704755,
-      "top100_mass_change": 0.010932603874539759,
+      "js_divergence": 0.0683765315370475,
+      "top100_mass_change": 0.0109326038745397,
       "mean_length_change": -37.253,
       "overlap_loss": 0.6112833230006199,
-      "class_marker_asymmetry": 0.005812263876780022,
+      "class_marker_asymmetry": 0.0172512938470386,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.9247311827956989,
-        "POS": 0.9189189189189189
-      }
+      ]
     },
     "Yelp n500||long||46": {
-      "lexical_novelty": 0.36355838745251806,
-      "js_divergence": 0.06764699859144566,
-      "top100_mass_change": 0.005225661875404963,
+      "lexical_novelty": 0.363558387452518,
+      "js_divergence": 0.0676469985914456,
+      "top100_mass_change": 0.0052256618754049,
       "mean_length_change": -36.385000000000005,
       "overlap_loss": 0.6045077286225539,
-      "class_marker_asymmetry": 0.03899938715248763,
+      "class_marker_asymmetry": 0.0339606622329136,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.9247311827956989,
-        "POS": 0.9637305699481865
-      }
+      ]
     },
     "Yelp n1000||short||42": {
       "lexical_novelty": 0.3599412340842311,
-      "js_divergence": 0.04218951053018158,
-      "top100_mass_change": 0.004183428756257546,
+      "js_divergence": 0.0421895105301815,
+      "top100_mass_change": 0.0041834287562575,
       "mean_length_change": -24.343000000000018,
       "overlap_loss": 0.579043426915025,
       "class_marker_asymmetry": 0.1119293078055964,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.8571428571428572,
-        "POS": 0.9690721649484536
-      }
+      ]
     },
     "Yelp n1000||short||43": {
-      "lexical_novelty": 0.35048713464901327,
-      "js_divergence": 0.04127418828939843,
-      "top100_mass_change": 0.006022454909826003,
+      "lexical_novelty": 0.3504871346490132,
+      "js_divergence": 0.0412741882893984,
+      "top100_mass_change": 0.006022454909826,
       "mean_length_change": -25.477000000000004,
       "overlap_loss": 0.5757180156657964,
-      "class_marker_asymmetry": 0.04026459591601961,
+      "class_marker_asymmetry": 0.0398361028909628,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.907103825136612,
-        "POS": 0.9473684210526316
-      }
+      ]
     },
     "Yelp n1000||short||44": {
-      "lexical_novelty": 0.36624177965413657,
-      "js_divergence": 0.04279315221584157,
-      "top100_mass_change": 0.001765989779876187,
+      "lexical_novelty": 0.3662417796541365,
+      "js_divergence": 0.0427931522158415,
+      "top100_mass_change": 0.0017659897798761,
       "mean_length_change": -19.831000000000003,
       "overlap_loss": 0.5784186649384316,
-      "class_marker_asymmetry": 0.07248801159808183,
+      "class_marker_asymmetry": 0.0560286866875839,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.907103825136612,
-        "POS": 0.9795918367346939
-      }
+      ]
     },
     "Yelp n1000||short||45": {
       "lexical_novelty": 0.3601021332674409,
-      "js_divergence": 0.04195143460256572,
-      "top100_mass_change": 0.0027615134066638625,
+      "js_divergence": 0.0419514346025657,
+      "top100_mass_change": 0.0027615134066638,
       "mean_length_change": -26.527,
       "overlap_loss": 0.5771742679873735,
-      "class_marker_asymmetry": 0.0687029456387942,
+      "class_marker_asymmetry": 0.0863906007026436,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.8950276243093923,
-        "POS": 0.9637305699481865
-      }
+      ]
     },
     "Yelp n1000||short||46": {
       "lexical_novelty": 0.3572764988204669,
-      "js_divergence": 0.04209300249516654,
-      "top100_mass_change": 0.002070573422162658,
+      "js_divergence": 0.0420930024951665,
+      "top100_mass_change": 0.0020705734221626,
       "mean_length_change": -22.6015,
       "overlap_loss": 0.5742078034059064,
-      "class_marker_asymmetry": 0.06539444741691935,
+      "class_marker_asymmetry": 0.0837320574162679,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.8764044943820225,
-        "POS": 0.9417989417989419
-      }
+      ]
     },
     "Yelp n1000||long||42": {
-      "lexical_novelty": 0.34795578171609054,
-      "js_divergence": 0.050358900294659684,
-      "top100_mass_change": 0.0019281098858574541,
+      "lexical_novelty": 0.3479557817160905,
+      "js_divergence": 0.0503589002946596,
+      "top100_mass_change": 0.0019281098858574,
       "mean_length_change": -37.26350000000001,
       "overlap_loss": 0.5913115204839153,
-      "class_marker_asymmetry": 0.09691027248888384,
+      "class_marker_asymmetry": 0.090702947845805,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.88268156424581,
-        "POS": 0.9795918367346939
-      }
+      ]
     },
     "Yelp n1000||long||43": {
       "lexical_novelty": 0.3405816317510828,
-      "js_divergence": 0.05019177646814448,
-      "top100_mass_change": 0.0032924342853292154,
+      "js_divergence": 0.0501917764681444,
+      "top100_mass_change": 0.0032924342853292,
       "mean_length_change": -36.3815,
       "overlap_loss": 0.5861992456179277,
-      "class_marker_asymmetry": 0.06797326384955249,
+      "class_marker_asymmetry": 0.0854700854700855,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.9010989010989011,
-        "POS": 0.9690721649484536
-      }
+      ]
     },
     "Yelp n1000||long||44": {
       "lexical_novelty": 0.3529668411867365,
-      "js_divergence": 0.05073217464900572,
-      "top100_mass_change": 0.0049572209808562695,
+      "js_divergence": 0.0507321746490057,
+      "top100_mass_change": 0.0049572209808562,
       "mean_length_change": -33.78450000000001,
       "overlap_loss": 0.589196675900277,
-      "class_marker_asymmetry": 0.056028686687583984,
+      "class_marker_asymmetry": 0.0443409821527547,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.9130434782608696,
-        "POS": 0.9690721649484536
-      }
+      ]
     },
     "Yelp n1000||long||45": {
       "lexical_novelty": 0.3630755864465682,
-      "js_divergence": 0.051457322885953616,
-      "top100_mass_change": 0.005826479071014745,
+      "js_divergence": 0.0514573228859536,
+      "top100_mass_change": 0.0058264790710147,
       "mean_length_change": -34.6965,
       "overlap_loss": 0.5967768549584731,
-      "class_marker_asymmetry": 0.04481165102926765,
+      "class_marker_asymmetry": 0.0448116510292676,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.9189189189189189,
-        "POS": 0.9637305699481865
-      }
+      ]
     },
     "Yelp n1000||long||46": {
       "lexical_novelty": 0.3425747769809341,
       "js_divergence": 0.0491746378881707,
-      "top100_mass_change": 0.0057489774619114975,
+      "top100_mass_change": 0.0057489774619114,
       "mean_length_change": -32.8815,
       "overlap_loss": 0.5842597201482219,
-      "class_marker_asymmetry": 0.0740445406390613,
+      "class_marker_asymmetry": 0.0863906007026436,
       "labels": [
         "NEG",
         "POS"
-      ],
-      "churn": {
-        "NEG": 0.8950276243093923,
-        "POS": 0.9690721649484536
-      }
+      ]
     }
   }
 }

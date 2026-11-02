@@ -5,11 +5,13 @@ Guarantees 1-to-1 exact matching with the manuscript LaTeX templates and table n
 - Table 8: Canonical within-period performance across datasets and model families
 - Table 9: Temporal Macro-F1 across Reference, Short, and Long, with Delta = Target - Reference
 - Table 10: Calibration and confidence-based selective risk across evaluation periods (ECE, R_80, R_100)
-- Table 11: Frequency and observed benefit of explicit P5 abstention on reference samples
-- Table 12: Temporal-forensics evidence by dataset and target horizon
+- Table 11: Focused retained-error differences across evaluated historical cohorts (11 contrasts, 3,000 bootstrap replicates)
+- Table 12: Frequency and observed benefit of explicit Abstention-aware (P5) abstention on reference samples
+- Table 13: Temporal-forensics evidence by dataset and target horizon
 """
 
-from typing import Dict, List, Sequence, Union
+from decimal import Decimal, ROUND_HALF_UP
+from typing import Dict, List, Sequence
 
 LATEX_MODEL_NAMES = {
     "distilbert": "DistilBERT",
@@ -24,6 +26,12 @@ LATEX_MODEL_LONG_NAMES = {
     "phi3.5:latest": r"\texttt{phi3.5:latest}",
     "qwen2.5:3b-instruct": r"\texttt{qwen2.5:3b-instruct}"
 }
+
+
+def fmt_half_up(val: float, decimals: int = 4) -> str:
+    """Format a floating-point number with standard half-up rounding."""
+    q = "0." + ("0" * decimals) if decimals > 0 else "0"
+    return str(Decimal(str(round(float(val), 10))).quantize(Decimal(q), rounding=ROUND_HALF_UP))
 
 
 def build_table7_latex(rows: Sequence[Dict[str, any]]) -> str:
@@ -90,11 +98,11 @@ def build_table8_latex(rows: Sequence[Dict[str, any]]) -> str:
     for i, row in enumerate(rows):
         if i > 0 and rows[i - 1]["dataset_setting"] != row["dataset_setting"]:
             lines.append(r"\midrule")
-        
+
         setting = (r"\textbf{" + row["dataset_setting"] + "}"
                    if i == 0 or rows[i - 1]["dataset_setting"] != row["dataset_setting"] else "")
         model_name = LATEX_MODEL_NAMES.get(row["model"], row["model"])
-        
+
         lines.append(
             f"{setting} & {model_name} & {row['accuracy']:.4f} & "
             f"{row['macro_f1']:.4f} & {row['ece']:.4f} & "
@@ -107,7 +115,7 @@ def build_table8_latex(rows: Sequence[Dict[str, any]]) -> str:
 
 def build_table9_latex(rows: Sequence[Dict[str, any]]) -> str:
     """Format Table 9 (RQ2 Temporal Robustness) as LaTeX.
-    
+
     Adheres strictly to the paper's sign convention: Delta_j = MacroF1(T_j) - MacroF1(T_0).
     Negative indicates decline; positive indicates improvement.
     """
@@ -131,11 +139,11 @@ def build_table9_latex(rows: Sequence[Dict[str, any]]) -> str:
     for i, row in enumerate(rows):
         if i > 0 and rows[i - 1]["dataset_setting"] != row["dataset_setting"]:
             lines.append(r"\midrule")
-        
+
         setting = (r"\textbf{" + row["dataset_setting"] + "}"
                    if i == 0 or rows[i - 1]["dataset_setting"] != row["dataset_setting"] else "")
         model_name = LATEX_MODEL_NAMES.get(row["model"], row["model"])
-        
+
         def fmt_delta(val: float) -> str:
             return f"+{val:.4f}" if val > 0 else f"{val:.4f}"
 
@@ -161,7 +169,7 @@ def build_table10_latex(
         r"$R_{80}$ and $R_{100}$ are retained error at 80\% and 100\% coverage, respectively; $R_{100}=1-\mathrm{Accuracy}$. "
         r"Boldface marks the lowest mean for each metric and period within a dataset setting and does not establish "
         r"a statistically reliable difference. Supervised confidence is the maximum predicted class probability; "
-        r"frozen models use P3 self-reported confidence. Ties at the coverage cutoff receive equal fractional inclusion.}",
+        r"frozen models use \texttt{Strict JSON} self-reported confidence. Ties at the coverage cutoff receive equal fractional inclusion.}",
         r"\label{tab:temporal-reliability}",
         r"\setlength{\tabcolsep}{3.2pt}",
         r"\begin{tabular}{llrrrrrrrrr}",
@@ -175,8 +183,7 @@ def build_table10_latex(
     for si, setting in enumerate(settings):
         if si > 0:
             lines.append(r"\midrule")
-        
-        # Identify minimums for bolding within setting
+
         min_ece = [min(means[setting, m, p]["ece"] for m in models) for p in ("within", "short", "long")]
         min_r80 = [min(means[setting, m, p]["risk_at_80"] for m in models) for p in ("within", "short", "long")]
         min_r100 = [min(means[setting, m, p]["risk_at_100"] for m in models) for p in ("within", "short", "long")]
@@ -186,7 +193,7 @@ def build_table10_latex(
             m_name = LATEX_MODEL_LONG_NAMES.get(model, model)
 
             def fmt_val(val: float, best_val: float) -> str:
-                s = f"{val:.4f}"
+                s = fmt_half_up(val, 4)
                 return r"\textbf{" + s + "}" if abs(val - best_val) < 1e-5 else s
 
             eces = [fmt_val(means[setting, model, p]["ece"], min_ece[pi]) for pi, p in enumerate(("within", "short", "long"))]
@@ -202,16 +209,70 @@ def build_table10_latex(
     return "\n".join(lines) + "\n"
 
 
-def build_table11_latex(rows: Sequence[Dict[str, any]]) -> str:
-    """Format Table 11 (Explicit Abstention Frequency and Benefit) as LaTeX."""
+def build_table11_bootstrap_latex(rows: Sequence[Dict[str, any]]) -> str:
+    """Format Table 11 (Focused Retained-Error Differences with Cluster Bootstrap) as LaTeX."""
+    period_labels = {
+        ("within", "phi_minus_qwen_at_80"): ("Reference", "Phi - Qwen at 80%"),
+        ("short", "phi_minus_qwen_at_80"): ("Short", "Phi - Qwen at 80%"),
+        ("long", "phi_minus_qwen_at_80"): ("Long", "Phi - Qwen at 80%"),
+        ("within", "qwen_80_minus_100"): ("Reference", "Qwen 80% - 100%"),
+        ("short", "qwen_80_minus_100"): ("Short", "Qwen 80% - 100%"),
+        ("long", "qwen_80_minus_100"): ("Long", "Qwen 80% - 100%"),
+        ("short", "distilbert_period_minus_reference_at_80"): ("Short - Ref.", "DistilBERT at 80%"),
+        ("long", "distilbert_period_minus_reference_at_80"): ("Long - Ref.", "DistilBERT at 80%"),
+    }
+
     lines = [
         r"\begin{table*}[t]",
         r"\centering",
         r"\footnotesize",
-        r"\caption{Frequency and observed benefit of explicit P5 abstention on the reference samples. "
-        r"Error rates are percentages averaged across five sampling seeds. ``Before'' scores all P5 best-guess labels; "
+        r"\caption{Focused retained-error differences across evaluated historical cohorts. "
+        r"Differences are five-seed means in percentage points (pp). Conditional 95\% intervals use "
+        r"3,000 synchronized document-cluster bootstrap resamples conditional on the archived models, "
+        r"fixed seeds, and evaluated splits; intervals are not adjusted for multiple comparisons.}",
+        r"\label{tab:rq2-bootstrap-contrasts}",
+        r"\begin{tabular}{lllrrrrr}",
+        r"\toprule",
+        r"\textbf{Setting} & \textbf{Period} & \textbf{Contrast} & \textbf{Diff. (pp)} & "
+        r"\textbf{95\% CI (pp)} & \textbf{Seed SD} & \textbf{Seed signs} & \textbf{Clusters} \\",
+        r"\midrule"
+    ]
+
+    for i, r in enumerate(rows):
+        prev_contrast = rows[i - 1]["contrast"] if i > 0 else None
+        if i > 0 and (rows[i - 1]["setting"] != r["setting"] or prev_contrast != r["contrast"]):
+            lines.append(r"\midrule")
+
+        p_str, c_str = period_labels.get((r["period"], r["contrast"]), (r["period"], r["contrast"]))
+        diff = float(r["mean_difference_pp"])
+        lo = float(r["ci_95_low_pp"])
+        hi = float(r["ci_95_high_pp"])
+        sd = float(r["seed_sd_pp"])
+        neg = int(r["seed_diffs_negative"])
+        pos = int(r["seed_diffs_positive"])
+        clusters = int(r["unique_document_clusters_in_contrast"])
+
+        sign_str = f"{neg} neg." if neg == 5 else (f"{pos} pos." if pos == 5 else f"{neg} neg. / {pos} pos.")
+
+        lines.append(
+            f"{r['setting']} & {p_str} & {c_str} & {diff:+.3f} & "
+            f"[{lo:+.3f}, {hi:+.3f}] & {sd:.3f} & {sign_str} & {clusters:,} " + r"\\"
+        )
+
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table*}"]
+    return "\n".join(lines) + "\n"
+
+
+def build_table12_abstention_latex(rows: Sequence[Dict[str, any]]) -> str:
+    """Format Table 12 (Explicit Abstention-aware Abstention Frequency and Benefit) as LaTeX."""
+    lines = [
+        r"\begin{table*}[t]",
+        r"\centering",
+        r"\footnotesize",
+        r"\caption{Frequency and observed benefit of explicit \texttt{Abstention-aware} abstention on the reference samples. "
+        r"Error rates are percentages averaged across five sampling seeds. ``Before'' scores all \texttt{Abstention-aware} best-guess labels; "
         r"``after'' scores only retained predictions. Counts are row occurrences across sampling runs and may include "
-        r"repeated texts. A dash indicates that no abstentions occurred. No P5 request or response-format failures occurred.}",
+        r"repeated texts. A dash indicates that no abstentions occurred. No \texttt{Abstention-aware} request or response-format failures occurred.}",
         r"\label{tab:rq3-abstention}",
         r"\setlength{\tabcolsep}{5pt}",
         r"\begin{tabular}{llrrrrr}",
@@ -234,8 +295,8 @@ def build_table11_latex(rows: Sequence[Dict[str, any]]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def build_table12_latex(rows: Sequence[Dict[str, any]]) -> str:
-    """Format Table 12 (Temporal Forensics Evidence) as LaTeX."""
+def build_table13_forensics_latex(rows: Sequence[Dict[str, any]]) -> str:
+    """Format Table 13 (Temporal Forensics Evidence) as LaTeX."""
     lines = [
         r"\begin{table*}[t]",
         r"\centering",
@@ -280,3 +341,8 @@ def build_table12_latex(rows: Sequence[Dict[str, any]]) -> str:
         r"\end{table*}"
     ]
     return "\n".join(lines) + "\n"
+
+
+# Backwards-compatible aliases
+build_table11_latex = build_table12_abstention_latex
+build_table12_latex = build_table13_forensics_latex

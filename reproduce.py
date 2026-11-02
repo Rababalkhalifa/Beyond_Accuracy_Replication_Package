@@ -3,11 +3,12 @@
 
 'Aging Gracefully? Reliability Profiling and Temporal Forensics of Frozen and Adapted Text Classifiers'
 Author: Rabab Alkhalifa
-SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7560344
+Affiliation: Department of Computer Engineering, College of Computer Science and Information Technology,
+             Imam Abdulrahman Bin Faisal University
 
 Provides an end-to-end, fully reproducible CLI to verify all mathematical formulas,
-audit dataset splits, generate all publication tables (Tables 7-12), and render all
-publication figures (Figures 4 and 5).
+audit dataset splits, generate all publication tables (Tables 7-13), and render all
+publication figures (Figures 3, 4, 5, and 6).
 
 Usage:
     python reproduce.py --all
@@ -18,6 +19,7 @@ Usage:
     python reproduce.py --table10
     python reproduce.py --table11
     python reproduce.py --table12
+    python reproduce.py --table13
     python reproduce.py --figures
 """
 
@@ -35,6 +37,7 @@ from scripts.run_table9 import generate_table9
 from scripts.run_table10 import generate_table10
 from scripts.run_table11 import generate_table11
 from scripts.run_table12 import generate_table12
+from scripts.run_table13 import generate_table13
 from scripts.plot_figures import run_figures_and_reliability
 
 
@@ -43,14 +46,17 @@ def main():
         description="Master reproduction CLI for 'Aging Gracefully? Reliability Profiling and Temporal Forensics'.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""Examples:
-  python reproduce.py --all          # Run complete end-to-end replication
+  python reproduce.py --all          # Run complete end-to-end replication (Tables 7-13 & Figures 3-6)
   python reproduce.py --table9       # Reproduce Table 9 (Temporal Macro-F1 & deltas)
-  python reproduce.py --figures      # Generate Figure 4 and Figure 5
+  python reproduce.py --table11      # Reproduce Table 11 (11 RQ2 bootstrap contrasts)
+  python reproduce.py --table12      # Reproduce Table 12 (P5 Abstention & S_prompt)
+  python reproduce.py --table13      # Reproduce Table 13 (Temporal forensics evidence)
+  python reproduce.py --figures      # Generate Figures 3, 4, 5, and 6
   python reproduce.py --audit        # Verify SHA-256 checksums and cohort integrity
 """
     )
     parser.add_argument("--all", action="store_true",
-                        help="Execute complete replication suite: audit, tables 7-12, and publication figures")
+                        help="Execute complete replication suite: audit, tables 7-13, and figures 3-6")
     parser.add_argument("--audit", action="store_true",
                         help="Run cryptographic audit on 65 split files and prediction cohorts")
     parser.add_argument("--table7", action="store_true",
@@ -62,11 +68,15 @@ def main():
     parser.add_argument("--table10", action="store_true",
                         help="Reproduce Table 10 (Period-Specific ECE, R_80, and R_100)")
     parser.add_argument("--table11", action="store_true",
-                        help="Reproduce Table 11 (P5 Abstention & Prompt Sensitivity S_prompt)")
+                        help="Reproduce Table 11 (Focused Retained-Error Differences & 3,000-Replicate Cluster Bootstrap)")
     parser.add_argument("--table12", action="store_true",
-                        help="Reproduce Table 12 (Temporal Forensics Movement Evidence)")
+                        help="Reproduce Table 12 (Explicit Abstention-aware P5 Abstention & Prompt Sensitivity S_prompt)")
+    parser.add_argument("--table13", action="store_true",
+                        help="Reproduce Table 13 (Temporal Forensics Movement Evidence)")
     parser.add_argument("--figures", action="store_true",
-                        help="Generate Figure 4 (Risk-Coverage Rankings) and Figure 5 (Movement vs Response)")
+                        help="Generate Figure 3, Figure 4, Figure 5, and Figure 6")
+    parser.add_argument("--recompute-bootstrap", action="store_true",
+                        help="Re-run the 3,000-replicate synchronized document-cluster bootstrap for Table 11 from scratch")
 
     parser.add_argument("--splits-dir", type=Path, default=BASE_DIR / "data" / "splits",
                         help="Path to dataset splits directory")
@@ -79,9 +89,8 @@ def main():
 
     args = parser.parse_args()
 
-    # If no flags are provided, show help
     if not any([args.all, args.audit, args.table7, args.table8, args.table9,
-                args.table10, args.table11, args.table12, args.figures]):
+                args.table10, args.table11, args.table12, args.table13, args.figures]):
         parser.print_help()
         sys.exit(1)
 
@@ -108,10 +117,13 @@ def main():
         generate_table10(args.archives_dir, args.tables_dir)
 
     if args.all or args.table11:
-        generate_table11(args.archives_dir, args.tables_dir)
+        generate_table11(args.archives_dir, args.tables_dir, recompute_bootstrap=args.recompute_bootstrap)
 
     if args.all or args.table12:
-        generate_table12(args.splits_dir, args.tables_dir)
+        generate_table12(args.archives_dir, args.tables_dir)
+
+    if args.all or args.table13:
+        generate_table13(args.splits_dir, args.tables_dir)
 
     if args.all or args.figures:
         run_figures_and_reliability(args.archives_dir, args.splits_dir, args.figures_dir, args.tables_dir)

@@ -5,7 +5,7 @@ Computes five-seed means for:
 - Selective risk at 80% coverage (R_80) across Reference, Short, and Long
 - Selective risk at 100% coverage (R_100 = 1 - Accuracy) across Reference, Short, and Long
 
-Adheres strictly to the paper's definition of equal fractional tie-handling.
+Adheres strictly to the paper's definition of equal fractional tie-handling and standard half-up display rounding.
 """
 
 import argparse
@@ -15,13 +15,12 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-# Add project root to sys.path
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
 from src.loader import ArchiveManager
 from src.metrics import macro_f1, ece_10, risk_sweep
-from src.tables import build_table10_latex
+from src.tables import build_table10_latex, fmt_half_up
 
 SEEDS = range(42, 47)
 MODELS = ("distilbert", "tfidf_lr", "phi3.5:latest", "qwen2.5:3b-instruct")
@@ -86,7 +85,7 @@ def generate_table10(archives_dir: Path, out_dir: Path) -> dict:
         for key, r_list in grouped.items()
     }
 
-    # Print to console
+    # Print to console using standard half-up rounding matching Table 10
     print("\n" + "=" * 115)
     print("Table 10: Calibration (ECE) and Selective Risk (R_80, R_100) Across Periods (5-Seed Means)")
     print("=" * 115)
@@ -94,9 +93,9 @@ def generate_table10(archives_dir: Path, out_dir: Path) -> dict:
     print("-" * 115)
     for setting in SETTINGS:
         for model in MODELS:
-            ece_str = f"{means[setting, model, 'within']['ece']:.4f} / {means[setting, model, 'short']['ece']:.4f} / {means[setting, model, 'long']['ece']:.4f}"
-            r80_str = f"{means[setting, model, 'within']['risk_at_80']:.4f} / {means[setting, model, 'short']['risk_at_80']:.4f} / {means[setting, model, 'long']['risk_at_80']:.4f}"
-            r100_str = f"{means[setting, model, 'within']['risk_at_100']:.4f} / {means[setting, model, 'short']['risk_at_100']:.4f} / {means[setting, model, 'long']['risk_at_100']:.4f}"
+            ece_str = " / ".join(fmt_half_up(means[setting, model, p]["ece"], 4) for p in ("within", "short", "long"))
+            r80_str = " / ".join(fmt_half_up(means[setting, model, p]["risk_at_80"], 4) for p in ("within", "short", "long"))
+            r100_str = " / ".join(fmt_half_up(means[setting, model, p]["risk_at_100"], 4) for p in ("within", "short", "long"))
             print(f"{setting:15} {model:22} | {ece_str:^24} | {r80_str:^24} | {r100_str:^24}")
     print("=" * 115 + "\n")
 
