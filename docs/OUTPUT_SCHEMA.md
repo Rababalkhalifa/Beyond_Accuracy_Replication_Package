@@ -20,7 +20,7 @@ Every prediction CSV in `archives/` and output directory contains the following 
 | `prompt_id` | `string` | Prompt template: `p1_minimal`, `p3_json_strict` (canonical), or `p5_abstain` (or `None` for adapted). |
 | `example_id` | `string` | Unique document identifier ensuring 1-to-1 matching across all models. |
 | `text_sha256` | `string` | SHA-256 cryptographic hash of raw input document string. |
-| `text` | `string` | Input text passed to the tokenizer or prompt template. |
+| `text` | `string` | Input text passed to the tokenizer or prompt template (in the public dehydrated archives, raw `text` is omitted or replaced with `token_count` and `char_length` to comply with third-party data redistribution terms; populated when running on hydrated splits). |
 | `true_label` | `string` | Ground truth gold label (`BELIEVER`/`DENIER` or `POS`/`NEG`). |
 | `predicted_label`| `string` | Assigned prediction class. |
 | `confidence` | `float` | Numerical confidence value bounded in $[0.0, 1.0]$. |

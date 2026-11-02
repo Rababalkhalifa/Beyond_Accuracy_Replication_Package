@@ -1,10 +1,10 @@
 # Dataset Splits & Provenance
 
-This directory contains the audited dataset split manifests for the **Beyond Accuracy** study under the joint quota temporal evaluation protocol (`shared_splits_paper_v6_joint_quota`).
+This directory contains the audited dataset split manifests for **"Aging Gracefully? Reliability Profiling and Temporal Forensics of Frozen and Adapted Text Classifiers"** under the joint quota temporal evaluation protocol (`shared_splits_paper_v6_joint_quota`).
 
 ---
 
-## 1. Experimental Settings
+## 1. Experimental Settings (Manuscript Table 6)
 
 | Setting | Domain / Task | Classes | Time Spans | Sample Size ($N$ per class) | Total per Evaluation Split ($2N$) |
 | :--- | :--- | :--- | :--- | :---: | :---: |
@@ -18,7 +18,7 @@ This directory contains the audited dataset split manifests for the **Beyond Acc
 
 Following standard academic NLP practice for third-party text corpora (and in compliance with the [Yelp Dataset Terms of Use](https://www.yelp.com/dataset) and social-media platform terms), the 65 CSV files in `splits/climate/` and `splits/yelp/` are distributed as **dehydrated split manifests**:
 - Each row records `example_id`, gold `label`, cryptographic text digest (`text_sha256` for Climate, `text_sha1` for Yelp), `token_count`, `char_length`, and temporal metadata (`source_year` / `date_value`, `source_period` / `source_role`, `sample_seed`), omitting raw third-party text.
-- `splits/forensics_and_descriptors_cache.json` stores the precomputed non-reconstructible split-level token statistics required for Table 7 (language descriptors) and Table 12 / Figure 5 (temporal forensics), so **`python reproduce.py --all` runs 100% out-of-the-box without raw text**.
+- `splits/forensics_and_descriptors_cache.json` stores the precomputed non-reconstructible split-level token statistics required for Table 7 (language descriptors) and Table 13 / Figure 6 (temporal forensics), so **`python reproduce.py --all` runs 100% out-of-the-box without raw text**.
 - `splits/checksums_sha256.txt` stores the authoritative SHA-256 checksums for the 65 dehydrated split files, while `splits/checksums_fulltext_sha256.txt` stores the SHA-256 checksums for the hydrated full-text split files (`audit_splits` accepts either state automatically).
 
 ### Hydrating Raw Text for Model Retraining or Live Prompting

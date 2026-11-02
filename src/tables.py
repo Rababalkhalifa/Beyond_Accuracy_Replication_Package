@@ -16,22 +16,19 @@ from typing import Dict, List, Sequence
 LATEX_MODEL_NAMES = {
     "distilbert": "DistilBERT",
     "tfidf_lr": "TF--IDF+LR",
-    "phi3.5:latest": r"\texttt{phi}",
-    "qwen2.5:3b-instruct": r"\texttt{qwen}"
+    "phi3.5:latest": r"\texttt{phi3.5:latest}",
+    "qwen2.5:3b-instruct": r"\texttt{qwen2.5:3b-instruct}",
+    "Phi": r"\texttt{phi3.5:latest}",
+    "Qwen": r"\texttt{qwen2.5:3b-instruct}",
 }
 
-LATEX_MODEL_LONG_NAMES = {
-    "distilbert": "DistilBERT",
-    "tfidf_lr": "TF--IDF+LR",
-    "phi3.5:latest": r"\texttt{phi3.5:latest}",
-    "qwen2.5:3b-instruct": r"\texttt{qwen2.5:3b-instruct}"
-}
+LATEX_MODEL_LONG_NAMES = LATEX_MODEL_NAMES
 
 
 def fmt_half_up(val: float, decimals: int = 4) -> str:
     """Format a floating-point number with standard half-up rounding."""
     q = "0." + ("0" * decimals) if decimals > 0 else "0"
-    return str(Decimal(str(round(float(val), 10))).quantize(Decimal(q), rounding=ROUND_HALF_UP))
+    return str(Decimal(str(float(val))).quantize(Decimal(q), rounding=ROUND_HALF_UP))
 
 
 def build_table7_latex(rows: Sequence[Dict[str, any]]) -> str:
@@ -84,14 +81,16 @@ def build_table8_latex(rows: Sequence[Dict[str, any]]) -> str:
         r"\centering",
         r"\small",
         r"\caption{Canonical within-period performance across datasets and model families. "
-        r"Values are means across five sampling seeds. Climate is stance classification and "
-        r"Yelp is sentiment classification. ECE uses predicted probabilities for supervised models "
-        r"and self-reported confidence for prompted LLMs. Latency is the recorded mean per evaluation example; "
+        r"Values are means across five sampling seeds (42--46). Climate is stance classification and "
+        r"Yelp is sentiment classification. Frozen prompted LLMs use the canonical \texttt{Strict-JSON} "
+        r"prompt on all attempted examples. ECE (10 equal-width bins on $[0, 1]$) uses predicted "
+        r"probabilities for supervised models and self-reported confidence for prompted LLMs. "
+        r"Mean inference time is the recorded client-side wall-clock mean per evaluated example; "
         r"timing procedures differ between model families.}",
         r"\label{tab:canonical-performance}",
         r"\begin{tabular}{llrrrr}",
         r"\toprule",
-        r"\textbf{Dataset setting} & \textbf{Model} & \textbf{Accuracy} & \textbf{Macro-F1} & \textbf{ECE} & \textbf{Mean latency (s)} \\",
+        r"\textbf{Dataset setting} & \textbf{Model} & \textbf{Accuracy} & \textbf{Macro-F1} & \textbf{ECE} & \textbf{Mean inference time (s)} \\",
         r"\midrule"
     ]
 
@@ -136,19 +135,32 @@ def build_table9_latex(rows: Sequence[Dict[str, any]]) -> str:
         r"\midrule"
     ]
 
+    max_f1 = {}
+    for setting in {r["dataset_setting"] for r in rows}:
+        sub = [r for r in rows if r["dataset_setting"] == setting]
+        max_f1[setting, "within_f1"] = max(r["within_f1"] for r in sub)
+        max_f1[setting, "short_f1"] = max(r["short_f1"] for r in sub)
+        max_f1[setting, "long_f1"] = max(r["long_f1"] for r in sub)
+
     for i, row in enumerate(rows):
         if i > 0 and rows[i - 1]["dataset_setting"] != row["dataset_setting"]:
             lines.append(r"\midrule")
 
-        setting = (r"\textbf{" + row["dataset_setting"] + "}"
-                   if i == 0 or rows[i - 1]["dataset_setting"] != row["dataset_setting"] else "")
+        ds = row["dataset_setting"]
+        setting = (r"\textbf{" + ds + "}"
+                   if i == 0 or rows[i - 1]["dataset_setting"] != ds else "")
         model_name = LATEX_MODEL_NAMES.get(row["model"], row["model"])
+
+        def fmt_f1(val: float, key: str) -> str:
+            s = f"{val:.4f}"
+            return r"\textbf{" + s + "}" if abs(val - max_f1[ds, key]) < 1e-5 else s
 
         def fmt_delta(val: float) -> str:
             return f"+{val:.4f}" if val > 0 else f"{val:.4f}"
 
         lines.append(
-            f"{setting} & {model_name} & {row['within_f1']:.4f} & {row['short_f1']:.4f} & {row['long_f1']:.4f} & "
+            f"{setting} & {model_name} & {fmt_f1(row['within_f1'], 'within_f1')} & "
+            f"{fmt_f1(row['short_f1'], 'short_f1')} & {fmt_f1(row['long_f1'], 'long_f1')} & "
             f"{fmt_delta(row['delta_short'])} & {fmt_delta(row['delta_long'])} " + r"\\"
         )
 
@@ -169,7 +181,7 @@ def build_table10_latex(
         r"$R_{80}$ and $R_{100}$ are retained error at 80\% and 100\% coverage, respectively; $R_{100}=1-\mathrm{Accuracy}$. "
         r"Boldface marks the lowest mean for each metric and period within a dataset setting and does not establish "
         r"a statistically reliable difference. Supervised confidence is the maximum predicted class probability; "
-        r"frozen models use \texttt{Strict JSON} self-reported confidence. Ties at the coverage cutoff receive equal fractional inclusion.}",
+        r"frozen models use \texttt{Strict-JSON} self-reported confidence. Ties at the coverage cutoff receive equal fractional inclusion.}",
         r"\label{tab:temporal-reliability}",
         r"\setlength{\tabcolsep}{3.2pt}",
         r"\begin{tabular}{llrrrrrrrrr}",
@@ -211,52 +223,50 @@ def build_table10_latex(
 
 def build_table11_bootstrap_latex(rows: Sequence[Dict[str, any]]) -> str:
     """Format Table 11 (Focused Retained-Error Differences with Cluster Bootstrap) as LaTeX."""
+    contrast_labels = {
+        "phi_minus_qwen_at_80": r"Phi $-$ Qwen, $R_{80}$",
+        "qwen_80_minus_100": r"Qwen, $R_{80} - R_{100}$",
+        "distilbert_period_minus_reference_at_80": r"DistilBERT, $R_{80}(\mathrm{target}) - R_{80}(\mathrm{ref})$",
+    }
     period_labels = {
-        ("within", "phi_minus_qwen_at_80"): ("Reference", "Phi - Qwen at 80%"),
-        ("short", "phi_minus_qwen_at_80"): ("Short", "Phi - Qwen at 80%"),
-        ("long", "phi_minus_qwen_at_80"): ("Long", "Phi - Qwen at 80%"),
-        ("within", "qwen_80_minus_100"): ("Reference", "Qwen 80% - 100%"),
-        ("short", "qwen_80_minus_100"): ("Short", "Qwen 80% - 100%"),
-        ("long", "qwen_80_minus_100"): ("Long", "Qwen 80% - 100%"),
-        ("short", "distilbert_period_minus_reference_at_80"): ("Short - Ref.", "DistilBERT at 80%"),
-        ("long", "distilbert_period_minus_reference_at_80"): ("Long - Ref.", "DistilBERT at 80%"),
+        "within": "Reference",
+        "short": "Short",
+        "long": "Long",
     }
 
     lines = [
         r"\begin{table*}[t]",
         r"\centering",
         r"\footnotesize",
-        r"\caption{Focused retained-error differences across evaluated historical cohorts. "
-        r"Differences are five-seed means in percentage points (pp). Conditional 95\% intervals use "
-        r"3,000 synchronized document-cluster bootstrap resamples conditional on the archived models, "
-        r"fixed seeds, and evaluated splits; intervals are not adjusted for multiple comparisons.}",
+        r"\caption{Focused retained-error differences across the evaluated historical cohorts. "
+        r"Values are five-seed mean differences in percentage points (pp), with unadjusted conditional "
+        r"95\% document-cluster bootstrap percentile intervals from 3,000 resamples. Negative Phi--Qwen "
+        r"values favor Phi; positive Qwen 80\%--100\% values indicate worse retained error under selection; "
+        r"positive temporal values indicate higher target-period retained error. All contrasts were exploratory; "
+        r"no multiplicity correction was applied. The observed direction was consistent across all five seeds for every contrast.}",
         r"\label{tab:rq2-bootstrap-contrasts}",
-        r"\begin{tabular}{lllrrrrr}",
+        r"\begin{tabular}{lllr}",
         r"\toprule",
-        r"\textbf{Setting} & \textbf{Period} & \textbf{Contrast} & \textbf{Diff. (pp)} & "
-        r"\textbf{95\% CI (pp)} & \textbf{Seed SD} & \textbf{Seed signs} & \textbf{Clusters} \\",
+        r"\textbf{Setting} & \textbf{Contrast} & \textbf{Period} & \textbf{Difference (pp) [95\% CI]} \\",
         r"\midrule"
     ]
 
     for i, r in enumerate(rows):
         prev_contrast = rows[i - 1]["contrast"] if i > 0 else None
-        if i > 0 and (rows[i - 1]["setting"] != r["setting"] or prev_contrast != r["contrast"]):
+        is_new_group = (i == 0 or rows[i - 1]["setting"] != r["setting"] or prev_contrast != r["contrast"])
+        if i > 0 and is_new_group:
             lines.append(r"\midrule")
 
-        p_str, c_str = period_labels.get((r["period"], r["contrast"]), (r["period"], r["contrast"]))
+        s_str = r["setting"] if is_new_group else ""
+        c_str = contrast_labels.get(r["contrast"], r["contrast"]) if is_new_group else ""
+        p_str = period_labels.get(r["period"], r["period"])
+
         diff = float(r["mean_difference_pp"])
         lo = float(r["ci_95_low_pp"])
         hi = float(r["ci_95_high_pp"])
-        sd = float(r["seed_sd_pp"])
-        neg = int(r["seed_diffs_negative"])
-        pos = int(r["seed_diffs_positive"])
-        clusters = int(r["unique_document_clusters_in_contrast"])
-
-        sign_str = f"{neg} neg." if neg == 5 else (f"{pos} pos." if pos == 5 else f"{neg} neg. / {pos} pos.")
 
         lines.append(
-            f"{r['setting']} & {p_str} & {c_str} & {diff:+.3f} & "
-            f"[{lo:+.3f}, {hi:+.3f}] & {sd:.3f} & {sign_str} & {clusters:,} " + r"\\"
+            f"{s_str} & {c_str} & {p_str} & ${diff:+.3f}$ [$ {lo:+.3f}, {hi:+.3f} $] ".replace("[$ ", "[$").replace(" $]", "$]") + r"\\"
         )
 
     lines += [r"\bottomrule", r"\end{tabular}", r"\end{table*}"]
@@ -286,8 +296,9 @@ def build_table12_abstention_latex(rows: Sequence[Dict[str, any]]) -> str:
         if i > 0 and rows[i - 1]["setting"] != r["setting"]:
             lines.append(r"\midrule")
         setting_str = r"\textbf{" + r["setting"] + "}" if i == 0 or rows[i - 1]["setting"] != r["setting"] else ""
+        model_str = LATEX_MODEL_NAMES.get(r["model"], r["model"])
         lines.append(
-            f"{setting_str} & {r['model']} & {r['abstained_slash_n']} & {r['incorrect_among_abstained']} & "
+            f"{setting_str} & {model_str} & {r['abstained_slash_n']} & {r['incorrect_among_abstained']} & "
             f"{r['error_before_pct']:.3f} & {r['error_after_pct']:.3f} & {r['reduction_pp']:.3f} " + r"\\"
         )
 
@@ -305,10 +316,10 @@ def build_table13_forensics_latex(rows: Sequence[Dict[str, any]]) -> str:
         r"from the within-period reference to each shifted target period and are reported as "
         r"mean $\pm$ sample standard deviation across five sampled seeds (42--46). Lexical novelty is the "
         r"proportion of target vocabulary types absent from the within-period vocabulary; distributional "
-        r"movement is measured using Jensen--Shannon divergence; top-term concentration is reported as "
+        r"movement is measured using Jensen--Shannon divergence; top-term concentration is the "
         r"paired within-seed target-minus-reference change in top-100 token mass ($\Delta C_{100}$); "
-        r"document-length change is reported as paired within-seed signed target-minus-reference change in "
-        r"mean token length ($\Delta L$); overlap loss is defined as one minus vocabulary Jaccard overlap; "
+        r"document-length change is the paired within-seed target-minus-reference change in "
+        r"mean token length ($\Delta L$); overlap loss is one minus vocabulary Jaccard overlap; "
         r"and class-marker asymmetry is the absolute difference between the two task-native class-marker churn values.}",
         r"\label{tab:rq5-temporal-forensics}",
         r"\resizebox{\textwidth}{!}{%",

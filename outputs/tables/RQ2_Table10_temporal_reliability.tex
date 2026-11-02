@@ -1,6 +1,6 @@
 \begin{table*}[t]
 \centering\footnotesize
-\caption{Calibration and confidence-based selective risk across evaluation periods (five-seed means). $R_{80}$ and $R_{100}$ are retained error at 80\% and 100\% coverage, respectively; $R_{100}=1-\mathrm{Accuracy}$. Boldface marks the lowest mean for each metric and period within a dataset setting and does not establish a statistically reliable difference. Supervised confidence is the maximum predicted class probability; frozen models use \texttt{Strict JSON} self-reported confidence. Ties at the coverage cutoff receive equal fractional inclusion.}
+\caption{Calibration and confidence-based selective risk across evaluation periods (five-seed means). $R_{80}$ and $R_{100}$ are retained error at 80\% and 100\% coverage, respectively; $R_{100}=1-\mathrm{Accuracy}$. Boldface marks the lowest mean for each metric and period within a dataset setting and does not establish a statistically reliable difference. Supervised confidence is the maximum predicted class probability; frozen models use \texttt{Strict-JSON} self-reported confidence. Ties at the coverage cutoff receive equal fractional inclusion.}
 \label{tab:temporal-reliability}
 \setlength{\tabcolsep}{3.2pt}
 \begin{tabular}{llrrrrrrrrr}
@@ -10,7 +10,7 @@
 Dataset setting & Model & Reference & Short & Long & Reference & Short & Long & Reference & Short & Long \\
 \midrule
 \textbf{Climate n500} & DistilBERT & 0.0994 & 0.1227 & 0.1142 & \textbf{0.0488} & \textbf{0.0800} & \textbf{0.0685} & \textbf{0.1122} & \textbf{0.1376} & \textbf{0.1292} \\
- & TF--IDF+LR & \textbf{0.0264} & \textbf{0.0563} & \textbf{0.0267} & 0.1378 & 0.2240 & 0.1698 & 0.1982 & 0.2746 & 0.2260 \\
+ & TF--IDF+LR & \textbf{0.0264} & \textbf{0.0563} & \textbf{0.0267} & 0.1377 & 0.2240 & 0.1698 & 0.1982 & 0.2746 & 0.2260 \\
  & \texttt{phi3.5:latest} & 0.2233 & 0.2309 & 0.1949 & 0.2672 & 0.2721 & 0.2288 & 0.2874 & 0.2942 & 0.2588 \\
  & \texttt{qwen2.5:3b-instruct} & 0.2841 & 0.3085 & 0.1989 & 0.3771 & 0.3954 & 0.2883 & 0.3480 & 0.3720 & 0.2646 \\
 \midrule

@@ -174,19 +174,22 @@ conda activate beyond-accuracy
 The package dependencies are pinned in [`requirements.txt`](requirements.txt):
 
 ```text
-# Core Scientific & Reproduction Stack
-numpy>=1.24.0,<2.0.0
-pandas>=2.0.0,<3.0.0
-scipy>=1.10.0,<2.0.0
-scikit-learn>=1.3.0,<1.6.0
-matplotlib>=3.7.0,<4.0.0
-seaborn>=0.12.0,<0.14.0
+# Core reproduction suite (Tables 7-13, Figures 3-6)
+numpy>=1.20.0
+scipy>=1.7.0
+pandas>=1.3.0
+matplotlib>=3.5.0
+pyyaml>=6.0
+jupyter>=1.0.0
+ipython>=7.0.0
 
-# Optional Model Retraining & Live Prompting Stack
-torch>=2.0.0
-transformers>=4.35.0
+# Optional execution dependencies (for running scripts/run_experiments.py)
 requests>=2.28.0
-tqdm>=4.65.0
+scikit-learn>=1.0.0
+joblib>=1.2.0
+torch>=2.0.0
+transformers>=4.30.0
+accelerate>=0.20.0
 ```
 
 * For fast reproduction of paper findings, tables, figures, and bootstrap statistics: only the **Core Stack** is required.
@@ -349,9 +352,9 @@ The following table maps every empirical table (Tables 7–13) and figure (Figur
 | Manuscript Item | Research Question | Underlying Mathematical Equation | CLI Reproduction Command | Output File |
 | :--- | :---: | :---: | :--- | :--- |
 | **Audit** | — | — | `python reproduce.py --audit` | Console report (`PASS: 65/65 splits, 180 conditions`) |
-| **Table 7** | Descriptors | Lowercase Word Regex `\b\w+\b` | `python reproduce.py --table7` | `outputs/tables/Table7_descriptors.tex`<br>`outputs/tables/Table7_descriptors.csv` |
-| **Table 8** | RQ1 | Eq. (1) [Acc], Eq. (5) [Macro-F1], Eq. (9) [ECE] | `python reproduce.py --table8` | `outputs/tables/RQ1_Table8.tex`<br>`outputs/tables/RQ1_Table8.csv` |
-| **Table 9** | RQ2 | Eq. (6) [$\Delta_j = F_1(T_j) - F_1(T_0)$] | `python reproduce.py --table9` | `outputs/tables/RQ2_Table9.tex`<br>`outputs/tables/RQ2_Table9.csv` |
+| **Table 7** | Descriptors | Lowercase Word Regex `\b\w+\b` | `python reproduce.py --table7` | `outputs/tables/Table7_descriptors.tex`<br>`outputs/tables/Table7_descriptors_summary.csv` |
+| **Table 8** | RQ1 | Eq. (1) [Acc], Eq. (5) [Macro-F1], Eq. (9) [ECE] | `python reproduce.py --table8` | `outputs/tables/RQ1_Table8.tex`<br>`outputs/tables/RQ1_Table8_summary.csv` |
+| **Table 9** | RQ2 | Eq. (6) [$\Delta_j = F_1(T_j) - F_1(T_0)$] | `python reproduce.py --table9` | `outputs/tables/RQ2_Table9.tex`<br>`outputs/tables/RQ2_Table9_summary.csv` |
 | **Table 10** | RQ2 | Eq. (9) [ECE], Table 3 [$R(c)$ at $c \in \{0.8, 1.0\}$] | `python reproduce.py --table10` | `outputs/tables/RQ2_Table10_temporal_reliability.tex`<br>`outputs/tables/RQ2_Table10_summary.csv` |
 | **Table 11** | RQ2 | 11 Retained-Error Contrasts (3,000 Bootstrap Replicates) | `python reproduce.py --table11` | `outputs/tables/RQ2_Table11_bootstrap_contrasts.tex`<br>`outputs/tables/RQ2_Table11_bootstrap_contrasts.csv` |
 | **Table 12** | RQ3 | Explicit `Abstention-aware` Abstention & Eq. (10) [$S_{\text{prompt}}$] | `python reproduce.py --table12` | `outputs/tables/RQ3_Table12_abstention.tex`<br>`outputs/tables/RQ3_Table12_summary.csv`<br>`outputs/tables/RQ3_prompt_sensitivity_summary.csv` |

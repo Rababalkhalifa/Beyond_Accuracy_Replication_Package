@@ -6,7 +6,7 @@ policies), the public GitHub repository ships dehydrated split manifests in `dat
 containing `example_id`, `label`, cryptographic text digests (`text_sha256` / `text_sha1`),
 `token_count`, `char_length`, and temporal metadata.
 
-All paper verification commands (`python reproduce.py --all`, Tables 7-12, Figures 4-5) work
+All paper verification commands (`python reproduce.py --all`, Tables 7-13, Figures 3-6) work
 100% out-of-the-box without raw text. Researchers who wish to re-run model training or live
 LLM inference from scratch can restore the `text` column using this utility in two ways:
 
