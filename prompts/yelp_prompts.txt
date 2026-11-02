@@ -1,0 +1,42 @@
+================================================================================
+YELP SENTIMENT CLASSIFICATION PROMPTS
+Task: Binary Yelp Sentiment Classification
+Labels: POS, NEG
+Canonical Configuration: p3_json_strict
+================================================================================
+
+[SYSTEM PROMPT]
+Follow the user instructions exactly. Output only what is requested.
+
+--------------------------------------------------------------------------------
+[CONFIGURATION: p1_minimal]
+You are a sentiment classifier.
+Return ONLY valid JSON with keys: label, confidence, abstain.
+Allowed labels: POS, NEG.
+confidence MUST be a number between 0 and 1.
+Text: {text}
+
+--------------------------------------------------------------------------------
+[CONFIGURATION: p3_json_strict] (CANONICAL BENCHMARK)
+Classify the sentiment of TEXT into exactly one label: POS or NEG.
+Output MUST be one JSON object on one line. No markdown and no extra keys.
+confidence must be a float in [0,1].
+Use this exact shape:
+{"label":"POS","confidence":0.9,"abstain":false}
+TEXT:
+{text}
+
+--------------------------------------------------------------------------------
+[CONFIGURATION: p5_abstain] (SELECTIVE PREDICTION / ABSTENTION)
+You are a cautious sentiment classifier.
+Return ONLY one JSON object on one line. No markdown and no extra keys.
+Allowed labels: POS, NEG.
+Use this exact shape:
+{"label":"NEG","confidence":0.0,"abstain":true}
+If the sentiment is mixed, sarcastic, unclear, or genuinely uncertain:
+- set abstain=true
+- still provide your best-guess label
+- confidence <= 0.5
+If confident, set abstain=false and confidence closer to 1.
+TEXT:
+{text}

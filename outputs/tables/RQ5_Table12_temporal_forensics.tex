@@ -1,0 +1,22 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Temporal-forensics evidence by dataset and target horizon. Values quantify movement from the within-period reference to each shifted target period and are reported as mean $\pm$ sample standard deviation across five sampled seeds (42--46). Lexical novelty is the proportion of target vocabulary types absent from the within-period vocabulary; distributional movement is measured using Jensen--Shannon divergence; top-term concentration is reported as paired within-seed target-minus-reference change in top-100 token mass ($\Delta C_{100}$); document-length change is reported as paired within-seed signed target-minus-reference change in mean token length ($\Delta L$); overlap loss is defined as one minus vocabulary Jaccard overlap; and class-marker asymmetry is the absolute difference between the two task-native class-marker churn values.}
+\label{tab:rq5-temporal-forensics}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrrr}
+\toprule
+\textbf{Dataset} & \textbf{Target} & \textbf{Novelty} & \textbf{Distributional movement} & \textbf{Top-term concentration} & \textbf{Document-length change} & \textbf{Overlap loss} & \textbf{Class-marker asymmetry} \\
+\midrule
+\textbf{Climate n500} & short & 0.6324 $\pm$ 0.0081 & 0.2894 $\pm$ 0.0047 & 0.0398 $\pm$ 0.0057 & -1.0878 $\pm$ 0.1465 & 0.7907 $\pm$ 0.0034 & 0.0287 $\pm$ 0.0231 \\
+ & long & 0.7177 $\pm$ 0.0073 & 0.3323 $\pm$ 0.0033 & -0.0063 $\pm$ 0.0010 & 8.0938 $\pm$ 0.3244 & 0.8036 $\pm$ 0.0051 & 0.0181 $\pm$ 0.0107 \\
+\midrule
+\textbf{Yelp n500} & short & 0.3803 $\pm$ 0.0068 & 0.0590 $\pm$ 0.0010 & 0.0031 $\pm$ 0.0023 & -24.4268 $\pm$ 3.9735 & 0.5964 $\pm$ 0.0023 & 0.0351 $\pm$ 0.0173 \\
+ & long & 0.3709 $\pm$ 0.0071 & 0.0676 $\pm$ 0.0005 & 0.0056 $\pm$ 0.0031 & -35.1940 $\pm$ 3.0609 & 0.6084 $\pm$ 0.0025 & 0.0343 $\pm$ 0.0182 \\
+\midrule
+\textbf{Yelp n1000} & short & 0.3588 $\pm$ 0.0057 & 0.0421 $\pm$ 0.0005 & 0.0034 $\pm$ 0.0018 & -23.7559 $\pm$ 2.6326 & 0.5769 $\pm$ 0.0020 & 0.0718 $\pm$ 0.0258 \\
+ & long & 0.3494 $\pm$ 0.0090 & 0.0504 $\pm$ 0.0008 & 0.0044 $\pm$ 0.0017 & -35.0015 $\pm$ 1.8090 & 0.5895 $\pm$ 0.0049 & 0.0680 $\pm$ 0.0197 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}

@@ -1,0 +1,43 @@
+================================================================================
+CLIMATE STANCE CLASSIFICATION PROMPTS
+Task: Binary Climate Stance Classification
+Labels: BELIEVER, DENIER
+Canonical Configuration: p3_json_strict
+================================================================================
+
+[SYSTEM PROMPT]
+Follow the classification instructions exactly.
+
+--------------------------------------------------------------------------------
+[CONFIGURATION: p1_minimal]
+Classify the climate stance of TEXT as BELIEVER or DENIER.
+Return exactly one JSON object with keys label, confidence, abstain.
+Definitions:
+BELIEVER: accepts, supports, or expresses concern about climate change, climate science, or climate action.
+DENIER: rejects, doubts, mocks, minimizes, or argues against climate change, climate science, or climate action.
+confidence must be between 0 and 1. abstain must be false.
+TEXT:
+{text}
+
+--------------------------------------------------------------------------------
+[CONFIGURATION: p3_json_strict] (CANONICAL BENCHMARK)
+Determine the climate stance label for TEXT. Allowed labels are exactly BELIEVER and DENIER.
+Output one JSON object only. Do not add markdown or explanation.
+Definitions:
+BELIEVER: accepts, supports, or expresses concern about climate change, climate science, or climate action.
+DENIER: rejects, doubts, mocks, minimizes, or argues against climate change, climate science, or climate action.
+Use this exact structure: {"label":"BELIEVER","confidence":0.90,"abstain":false}
+confidence must be a number in [0,1]. abstain must be false.
+TEXT:
+{text}
+
+--------------------------------------------------------------------------------
+[CONFIGURATION: p5_abstain] (SELECTIVE PREDICTION / ABSTENTION)
+Classify the climate stance of TEXT as BELIEVER or DENIER.
+Return one JSON object only with keys label, confidence, abstain.
+Definitions:
+BELIEVER: accepts, supports, or expresses concern about climate change, climate science, or climate action.
+DENIER: rejects, doubts, mocks, minimizes, or argues against climate change, climate science, or climate action.
+Set abstain=true only when the text is genuinely mixed, unclear, or insufficient for a defensible decision. Even when abstaining, provide the best-guess label and confidence no higher than 0.50.
+TEXT:
+{text}

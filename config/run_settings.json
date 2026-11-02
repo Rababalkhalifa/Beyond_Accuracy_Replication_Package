@@ -1,0 +1,151 @@
+{
+  "framework": "Beyond Accuracy: Reliability Profiling and Temporal Forensics",
+  "environment": {
+    "os": "Microsoft Windows 11 Home 64-bit (10.0.26300)",
+    "python": "3.10",
+    "cpu": "11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (8 cores, 16 logical threads)",
+    "ram_gb": 16.0,
+    "gpu": "NVIDIA GeForce RTX 3050 Ti Laptop GPU (4 GB VRAM)",
+    "ollama_version": "0.40.13"
+  },
+  "datasets": {
+    "climate": {
+      "task": "stance_classification",
+      "labels": [
+        "BELIEVER",
+        "DENIER"
+      ],
+      "splits": [
+        "train",
+        "validation",
+        "within",
+        "short",
+        "long"
+      ],
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "evaluation_sizes_per_label": [
+        500
+      ]
+    },
+    "yelp": {
+      "task": "sentiment_classification",
+      "labels": [
+        "POS",
+        "NEG"
+      ],
+      "splits": [
+        "train",
+        "validation",
+        "within",
+        "short",
+        "long"
+      ],
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "evaluation_sizes_per_label": [
+        500,
+        1000
+      ]
+    }
+  },
+  "frozen_llm_execution": {
+    "models": {
+      "qwen2.5:3b-instruct": {
+        "ollama_tag": "qwen2.5:3b-instruct",
+        "digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "format": "gguf",
+        "family": "qwen2",
+        "parameter_size": "3.1B",
+        "quantization": "Q4_K_M",
+        "context_length": 32768,
+        "embedding_length": 2048,
+        "runner": "ggml"
+      },
+      "phi3.5:latest": {
+        "ollama_tag": "phi3.5:latest",
+        "digest": "61819fb370a3c1a9be6694869331e5f85f867a079e9271d66cb223acb81d04ba",
+        "format": "gguf",
+        "family": "phi3",
+        "parameter_size": "3.8B",
+        "quantization": "Q4_0",
+        "context_length": 131072,
+        "embedding_length": 3072,
+        "runner": "ggml"
+      }
+    },
+    "decoding_parameters": {
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "seed": 1,
+      "num_predict": 96,
+      "max_text_chars": 800,
+      "stream": false,
+      "keep_alive": "30m"
+    },
+    "runtime_controls": {
+      "timeout_sec": 600,
+      "retries": 2,
+      "checkpoint_every": 25,
+      "num_client_workers": 4,
+      "concurrency_type": "ThreadPoolExecutor multi-client concurrent requests",
+      "warmup_procedure": "Single request: user 'Reply with OK.', num_predict=4, temp=0.0",
+      "latency_timing": "time.perf_counter() elapsed between request transmission and JSON response receipt. Retry sleep backoff excluded."
+    }
+  },
+  "adapted_models": {
+    "distilbert": {
+      "base_checkpoint": "distilbert-base-uncased",
+      "parameter_count": "66M",
+      "max_sequence_length": 192,
+      "num_epochs": 3,
+      "learning_rate": 2e-05,
+      "optimizer": "AdamW",
+      "weight_decay": 0.01,
+      "warmup_ratio": 0.1,
+      "lr_scheduler": "linear",
+      "train_batch_size": 4,
+      "eval_batch_size": 8,
+      "gradient_accumulation_steps": 2,
+      "effective_batch_size": 8,
+      "checkpoint_selection_criterion": "validation Macro-F1",
+      "early_stopping_patience": 1,
+      "save_strategy": "epoch",
+      "evaluation_strategy": "epoch",
+      "load_best_model_at_end": true,
+      "save_total_limit": 1
+    },
+    "tfidf_lr": {
+      "ngram_range": [
+        1,
+        2
+      ],
+      "lowercase": true,
+      "sublinear_tf": true,
+      "min_df": 2,
+      "max_features": 50000,
+      "solver": "liblinear (historical) / lbfgs (reproducibility runner)",
+      "regularization_c_grid": [
+        0.25,
+        0.5,
+        1.0,
+        2.0,
+        4.0
+      ],
+      "max_iter": 1000,
+      "penalty": "l2",
+      "class_weight": null,
+      "model_selection": "Grid search over C maximizing validation Macro-F1"
+    }
+  }
+}

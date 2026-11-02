@@ -1,0 +1,112 @@
+{
+  "metadata": {
+    "title": "Beyond Accuracy: Canonical and Diagnostic Prompt Formulations",
+    "canonical_prompt": "p3_json_strict",
+    "diagnostic_prompts": [
+      "p1_minimal",
+      "p5_abstain"
+    ],
+    "max_text_chars": 800,
+    "json_required_keys": [
+      "label",
+      "confidence",
+      "abstain"
+    ]
+  },
+  "climate": {
+    "task": "climate_stance",
+    "labels": [
+      "BELIEVER",
+      "DENIER"
+    ],
+    "definitions": {
+      "BELIEVER": "accepts, supports, or expresses concern about climate change, climate science, or climate action.",
+      "DENIER": "rejects, doubts, mocks, minimizes, or argues against climate change, climate science, or climate action."
+    },
+    "system_prompt": "Follow the classification instructions exactly.",
+    "p1_minimal": {
+      "template": "Classify the climate stance of TEXT as BELIEVER or DENIER.\nReturn exactly one JSON object with keys label, confidence, abstain.\nDefinitions:\nBELIEVER: accepts, supports, or expresses concern about climate change, climate science, or climate action.\nDENIER: rejects, doubts, mocks, minimizes, or argues against climate change, climate science, or climate action.\nconfidence must be between 0 and 1. abstain must be false.\nTEXT:\n{text}",
+      "abstain_allowed": false
+    },
+    "p3_json_strict": {
+      "template": "Determine the climate stance label for TEXT. Allowed labels are exactly BELIEVER and DENIER.\nOutput one JSON object only. Do not add markdown or explanation.\nDefinitions:\nBELIEVER: accepts, supports, or expresses concern about climate change, climate science, or climate action.\nDENIER: rejects, doubts, mocks, minimizes, or argues against climate change, climate science, or climate action.\nUse this exact structure: {\"label\":\"BELIEVER\",\"confidence\":0.90,\"abstain\":false}\nconfidence must be a number in [0,1]. abstain must be false.\nTEXT:\n{text}",
+      "abstain_allowed": false
+    },
+    "p5_abstain": {
+      "template": "Classify the climate stance of TEXT as BELIEVER or DENIER.\nReturn one JSON object only with keys label, confidence, abstain.\nDefinitions:\nBELIEVER: accepts, supports, or expresses concern about climate change, climate science, or climate action.\nDENIER: rejects, doubts, mocks, minimizes, or argues against climate change, climate science, or climate action.\nSet abstain=true only when the text is genuinely mixed, unclear, or insufficient for a defensible decision. Even when abstaining, provide the best-guess label and confidence no higher than 0.50.\nTEXT:\n{text}",
+      "abstain_allowed": true
+    },
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "enum": [
+            "BELIEVER",
+            "DENIER"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "abstain": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "label",
+        "confidence",
+        "abstain"
+      ]
+    }
+  },
+  "yelp": {
+    "task": "sentiment",
+    "labels": [
+      "POS",
+      "NEG"
+    ],
+    "system_prompt": "Follow the user instructions exactly. Output only what is requested.",
+    "p1_minimal": {
+      "template": "You are a sentiment classifier.\nReturn ONLY valid JSON with keys: label, confidence, abstain.\nAllowed labels: POS, NEG.\nconfidence MUST be a number between 0 and 1.\nText: {text}",
+      "abstain_allowed": false
+    },
+    "p3_json_strict": {
+      "template": "Classify the sentiment of TEXT into exactly one label: POS or NEG.\nOutput MUST be one JSON object on one line. No markdown and no extra keys.\nconfidence must be a float in [0,1].\nUse this exact shape:\n{\"label\":\"POS\",\"confidence\":0.9,\"abstain\":false}\nTEXT:\n{text}",
+      "abstain_allowed": false
+    },
+    "p5_abstain": {
+      "template": "You are a cautious sentiment classifier.\nReturn ONLY one JSON object on one line. No markdown and no extra keys.\nAllowed labels: POS, NEG.\nUse this exact shape:\n{\"label\":\"NEG\",\"confidence\":0.0,\"abstain\":true}\nIf the sentiment is mixed, sarcastic, unclear, or genuinely uncertain:\n- set abstain=true\n- still provide your best-guess label\n- confidence <= 0.5\nIf confident, set abstain=false and confidence closer to 1.\nTEXT:\n{text}",
+      "abstain_allowed": true
+    },
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "enum": [
+            "POS",
+            "NEG"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "abstain": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "label",
+        "confidence",
+        "abstain"
+      ]
+    }
+  }
+}

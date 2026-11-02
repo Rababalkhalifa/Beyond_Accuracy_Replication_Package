@@ -1,0 +1,1072 @@
+{
+  "description": "Precomputed non-reconstructible token-level statistics for Table 7 (descriptors) and Table 12 / Figure 5 (temporal forensics), derived from the full-text splits. Used automatically when split CSVs are in dehydrated (ID + hash) mode.",
+  "descriptors": {
+    "climate/seed_42/long_2018_2019_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 26.769,
+      "med_len": 23.0,
+      "vocab_size": 6624.0,
+      "ttr": 0.24745040905525048,
+      "top100_mass": 0.499831895102544,
+      "total_tokens": 26769.0
+    },
+    "climate/seed_42/short_2013_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 17.364,
+      "med_len": 18.0,
+      "vocab_size": 4255.0,
+      "ttr": 0.24504722414190278,
+      "top100_mass": 0.5371458189357291,
+      "total_tokens": 17364.0
+    },
+    "climate/seed_42/train_7000.csv": {
+      "n_docs": 7000.0,
+      "mean_len": 19.05,
+      "med_len": 20.0,
+      "vocab_size": 18050.0,
+      "ttr": 0.13535808023997,
+      "top100_mass": 0.50893888263967,
+      "total_tokens": 133350.0
+    },
+    "climate/seed_42/validation_3000.csv": {
+      "n_docs": 3000.0,
+      "mean_len": 18.796,
+      "med_len": 20.0,
+      "vocab_size": 10320.0,
+      "ttr": 0.18301766333262395,
+      "top100_mass": 0.5064198056324041,
+      "total_tokens": 56388.0
+    },
+    "climate/seed_42/within_2010_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 18.357,
+      "med_len": 19.0,
+      "vocab_size": 4679.0,
+      "ttr": 0.25488914310617206,
+      "top100_mass": 0.5066732036825189,
+      "total_tokens": 18357.0
+    },
+    "climate/seed_43/long_2018_2019_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 26.971,
+      "med_len": 23.0,
+      "vocab_size": 6584.0,
+      "ttr": 0.2441140484223796,
+      "top100_mass": 0.4963479292573505,
+      "total_tokens": 26971.0
+    },
+    "climate/seed_43/short_2013_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 17.385,
+      "med_len": 18.0,
+      "vocab_size": 4298.0,
+      "ttr": 0.24722461892436007,
+      "top100_mass": 0.5427667529479436,
+      "total_tokens": 17385.0
+    },
+    "climate/seed_43/train_7000.csv": {
+      "n_docs": 7000.0,
+      "mean_len": 18.946142857142856,
+      "med_len": 20.0,
+      "vocab_size": 18196.0,
+      "ttr": 0.13720093799717997,
+      "top100_mass": 0.5095571658008038,
+      "total_tokens": 132623.0
+    },
+    "climate/seed_43/validation_3000.csv": {
+      "n_docs": 3000.0,
+      "mean_len": 19.055333333333333,
+      "med_len": 20.0,
+      "vocab_size": 10192.0,
+      "ttr": 0.1782877934436553,
+      "top100_mass": 0.5064024070251548,
+      "total_tokens": 57166.0
+    },
+    "climate/seed_43/within_2010_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 18.607,
+      "med_len": 20.0,
+      "vocab_size": 4752.0,
+      "ttr": 0.25538775729564145,
+      "top100_mass": 0.5021766002042242,
+      "total_tokens": 18607.0
+    },
+    "climate/seed_44/long_2018_2019_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 26.546,
+      "med_len": 23.0,
+      "vocab_size": 6591.0,
+      "ttr": 0.24828599412340843,
+      "top100_mass": 0.4972123860468621,
+      "total_tokens": 26546.0
+    },
+    "climate/seed_44/short_2013_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 17.46,
+      "med_len": 18.0,
+      "vocab_size": 4148.0,
+      "ttr": 0.23757159221076746,
+      "top100_mass": 0.5439289805269186,
+      "total_tokens": 17460.0
+    },
+    "climate/seed_44/train_7000.csv": {
+      "n_docs": 7000.0,
+      "mean_len": 19.000285714285713,
+      "med_len": 20.0,
+      "vocab_size": 18147.0,
+      "ttr": 0.1364415572698155,
+      "top100_mass": 0.5081728094314372,
+      "total_tokens": 133002.0
+    },
+    "climate/seed_44/validation_3000.csv": {
+      "n_docs": 3000.0,
+      "mean_len": 19.096,
+      "med_len": 20.0,
+      "vocab_size": 10319.0,
+      "ttr": 0.18012498254433737,
+      "top100_mass": 0.507785225527161,
+      "total_tokens": 57288.0
+    },
+    "climate/seed_44/within_2010_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 18.583,
+      "med_len": 20.0,
+      "vocab_size": 4774.0,
+      "ttr": 0.2569014690846473,
+      "top100_mass": 0.5048162298875316,
+      "total_tokens": 18583.0
+    },
+    "climate/seed_45/long_2018_2019_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 26.543,
+      "med_len": 23.0,
+      "vocab_size": 6673.0,
+      "ttr": 0.2514033831895415,
+      "top100_mass": 0.49561089552801113,
+      "total_tokens": 26543.0
+    },
+    "climate/seed_45/short_2013_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 17.212,
+      "med_len": 18.0,
+      "vocab_size": 4182.0,
+      "ttr": 0.24297002091564024,
+      "top100_mass": 0.5463630025563561,
+      "total_tokens": 17212.0
+    },
+    "climate/seed_45/train_7000.csv": {
+      "n_docs": 7000.0,
+      "mean_len": 18.992571428571427,
+      "med_len": 20.0,
+      "vocab_size": 18207.0,
+      "ttr": 0.13694828053073382,
+      "top100_mass": 0.5104853025242952,
+      "total_tokens": 132948.0
+    },
+    "climate/seed_45/validation_3000.csv": {
+      "n_docs": 3000.0,
+      "mean_len": 19.019333333333332,
+      "med_len": 20.0,
+      "vocab_size": 10276.0,
+      "ttr": 0.1800974447053875,
+      "top100_mass": 0.5087279610221178,
+      "total_tokens": 57058.0
+    },
+    "climate/seed_45/within_2010_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 18.428,
+      "med_len": 19.0,
+      "vocab_size": 4767.0,
+      "ttr": 0.25868243976557415,
+      "top100_mass": 0.5015194269589754,
+      "total_tokens": 18428.0
+    },
+    "climate/seed_46/long_2018_2019_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 26.007,
+      "med_len": 22.0,
+      "vocab_size": 6560.0,
+      "ttr": 0.2522397815972623,
+      "top100_mass": 0.49801976390971664,
+      "total_tokens": 26007.0
+    },
+    "climate/seed_46/short_2013_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 17.507,
+      "med_len": 18.0,
+      "vocab_size": 4293.0,
+      "ttr": 0.24521619923459187,
+      "top100_mass": 0.5468669674987148,
+      "total_tokens": 17507.0
+    },
+    "climate/seed_46/train_7000.csv": {
+      "n_docs": 7000.0,
+      "mean_len": 19.019285714285715,
+      "med_len": 20.0,
+      "vocab_size": 18168.0,
+      "ttr": 0.13646298869568482,
+      "top100_mass": 0.5069741240094641,
+      "total_tokens": 133135.0
+    },
+    "climate/seed_46/validation_3000.csv": {
+      "n_docs": 3000.0,
+      "mean_len": 18.897333333333332,
+      "med_len": 20.0,
+      "vocab_size": 10226.0,
+      "ttr": 0.18037818387074014,
+      "top100_mass": 0.5074966485571156,
+      "total_tokens": 56692.0
+    },
+    "climate/seed_46/within_2010_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 18.392,
+      "med_len": 19.0,
+      "vocab_size": 4809.0,
+      "ttr": 0.2614723792953458,
+      "top100_mass": 0.503099173553719,
+      "total_tokens": 18392.0
+    },
+    "yelp/seed_42/long_2019_2020_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 104.8465,
+      "med_len": 72.0,
+      "vocab_size": 11398.0,
+      "ttr": 0.05435565326453434,
+      "top100_mass": 0.540180168150582,
+      "total_tokens": 209693.0
+    },
+    "yelp/seed_42/long_2019_2020_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 106.052,
+      "med_len": 72.5,
+      "vocab_size": 8152.0,
+      "ttr": 0.07686795157092748,
+      "top100_mass": 0.5398955229510052,
+      "total_tokens": 106052.0
+    },
+    "yelp/seed_42/short_2015_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 117.767,
+      "med_len": 84.0,
+      "vocab_size": 12252.0,
+      "ttr": 0.05201796768194825,
+      "top100_mass": 0.5424354870209821,
+      "total_tokens": 235534.0
+    },
+    "yelp/seed_42/short_2015_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 118.384,
+      "med_len": 86.0,
+      "vocab_size": 8815.0,
+      "ttr": 0.0744610758210569,
+      "top100_mass": 0.5381808352480065,
+      "total_tokens": 118384.0
+    },
+    "yelp/seed_42/train_7000.csv": {
+      "n_docs": 7000.0,
+      "mean_len": 145.448,
+      "med_len": 114.0,
+      "vocab_size": 27831.0,
+      "ttr": 0.027335247943300306,
+      "top100_mass": 0.5350483628906157,
+      "total_tokens": 1018136.0
+    },
+    "yelp/seed_42/validation_3000.csv": {
+      "n_docs": 3000.0,
+      "mean_len": 145.82966666666667,
+      "med_len": 115.0,
+      "vocab_size": 18392.0,
+      "ttr": 0.042039914146412824,
+      "top100_mass": 0.5355997522223416,
+      "total_tokens": 437489.0
+    },
+    "yelp/seed_42/within_2011_2012_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 142.11,
+      "med_len": 107.0,
+      "vocab_size": 14219.0,
+      "ttr": 0.050028147209907815,
+      "top100_mass": 0.5382520582647246,
+      "total_tokens": 284220.0
+    },
+    "yelp/seed_42/within_2011_2012_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 141.075,
+      "med_len": 107.0,
+      "vocab_size": 9969.0,
+      "ttr": 0.07066454013822435,
+      "top100_mass": 0.5372248803827752,
+      "total_tokens": 141075.0
+    },
+    "yelp/seed_43/long_2019_2020_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 105.6735,
+      "med_len": 75.0,
+      "vocab_size": 11313.0,
+      "ttr": 0.05352808414597794,
+      "top100_mass": 0.5399366917912248,
+      "total_tokens": 211347.0
+    },
+    "yelp/seed_43/long_2019_2020_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 107.518,
+      "med_len": 75.0,
+      "vocab_size": 8074.0,
+      "ttr": 0.07509440279767109,
+      "top100_mass": 0.5407094626016109,
+      "total_tokens": 107518.0
+    },
+    "yelp/seed_43/short_2015_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 116.578,
+      "med_len": 81.0,
+      "vocab_size": 12009.0,
+      "ttr": 0.05150628763574602,
+      "top100_mass": 0.5426667124157216,
+      "total_tokens": 233156.0
+    },
+    "yelp/seed_43/short_2015_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 119.991,
+      "med_len": 82.0,
+      "vocab_size": 8620.0,
+      "ttr": 0.07183872123742614,
+      "top100_mass": 0.5410239101265928,
+      "total_tokens": 119991.0
+    },
+    "yelp/seed_43/train_7000.csv": {
+      "n_docs": 7000.0,
+      "mean_len": 149.5932857142857,
+      "med_len": 118.0,
+      "vocab_size": 28056.0,
+      "ttr": 0.026792646346808918,
+      "top100_mass": 0.5337558121879038,
+      "total_tokens": 1047153.0
+    },
+    "yelp/seed_43/validation_3000.csv": {
+      "n_docs": 3000.0,
+      "mean_len": 144.48833333333334,
+      "med_len": 119.5,
+      "vocab_size": 18345.0,
+      "ttr": 0.04232175608180591,
+      "top100_mass": 0.5339070051791955,
+      "total_tokens": 433465.0
+    },
+    "yelp/seed_43/within_2011_2012_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 142.055,
+      "med_len": 108.0,
+      "vocab_size": 14175.0,
+      "ttr": 0.04989264721410721,
+      "top100_mass": 0.5366442575058956,
+      "total_tokens": 284110.0
+    },
+    "yelp/seed_43/within_2011_2012_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 144.85,
+      "med_len": 109.0,
+      "vocab_size": 10233.0,
+      "ttr": 0.0706454953400069,
+      "top100_mass": 0.5358715913013462,
+      "total_tokens": 144850.0
+    },
+    "yelp/seed_44/long_2019_2020_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 104.9545,
+      "med_len": 74.0,
+      "vocab_size": 11460.0,
+      "ttr": 0.0545950864422202,
+      "top100_mass": 0.5425493904501475,
+      "total_tokens": 209909.0
+    },
+    "yelp/seed_44/long_2019_2020_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 106.394,
+      "med_len": 74.0,
+      "vocab_size": 8063.0,
+      "ttr": 0.07578434874147039,
+      "top100_mass": 0.5428407616970882,
+      "total_tokens": 106394.0
+    },
+    "yelp/seed_44/short_2015_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 118.908,
+      "med_len": 84.0,
+      "vocab_size": 12317.0,
+      "ttr": 0.051792141823931104,
+      "top100_mass": 0.5393581592491674,
+      "total_tokens": 237816.0
+    },
+    "yelp/seed_44/short_2015_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 117.786,
+      "med_len": 84.0,
+      "vocab_size": 8633.0,
+      "ttr": 0.07329393985702885,
+      "top100_mass": 0.5404971728388773,
+      "total_tokens": 117786.0
+    },
+    "yelp/seed_44/train_7000.csv": {
+      "n_docs": 7000.0,
+      "mean_len": 144.93371428571427,
+      "med_len": 113.0,
+      "vocab_size": 27662.0,
+      "ttr": 0.027265666275026218,
+      "top100_mass": 0.5335138427813306,
+      "total_tokens": 1014536.0
+    },
+    "yelp/seed_44/validation_3000.csv": {
+      "n_docs": 3000.0,
+      "mean_len": 149.02933333333334,
+      "med_len": 116.0,
+      "vocab_size": 18476.0,
+      "ttr": 0.041325197723938015,
+      "top100_mass": 0.5346643166445979,
+      "total_tokens": 447088.0
+    },
+    "yelp/seed_44/within_2011_2012_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 138.739,
+      "med_len": 104.0,
+      "vocab_size": 14005.0,
+      "ttr": 0.050472469889504754,
+      "top100_mass": 0.5375921694692912,
+      "total_tokens": 277478.0
+    },
+    "yelp/seed_44/within_2011_2012_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 136.371,
+      "med_len": 103.0,
+      "vocab_size": 9707.0,
+      "ttr": 0.07118082290222995,
+      "top100_mass": 0.5385675840171298,
+      "total_tokens": 136371.0
+    },
+    "yelp/seed_45/long_2019_2020_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 106.871,
+      "med_len": 76.0,
+      "vocab_size": 11510.0,
+      "ttr": 0.05384996865379757,
+      "top100_mass": 0.5419664829560873,
+      "total_tokens": 213742.0
+    },
+    "yelp/seed_45/long_2019_2020_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 105.735,
+      "med_len": 72.0,
+      "vocab_size": 8007.0,
+      "ttr": 0.07572705348276351,
+      "top100_mass": 0.5455998486782995,
+      "total_tokens": 105735.0
+    },
+    "yelp/seed_45/short_2015_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 115.0405,
+      "med_len": 83.0,
+      "vocab_size": 12141.0,
+      "ttr": 0.05276837287737797,
+      "top100_mass": 0.5389015172917364,
+      "total_tokens": 230081.0
+    },
+    "yelp/seed_45/short_2015_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 115.375,
+      "med_len": 84.0,
+      "vocab_size": 8664.0,
+      "ttr": 0.07509425785482124,
+      "top100_mass": 0.5406370530877573,
+      "total_tokens": 115375.0
+    },
+    "yelp/seed_45/train_7000.csv": {
+      "n_docs": 7000.0,
+      "mean_len": 148.46371428571427,
+      "med_len": 114.0,
+      "vocab_size": 27668.0,
+      "ttr": 0.026623147936099826,
+      "top100_mass": 0.5334492507067624,
+      "total_tokens": 1039246.0
+    },
+    "yelp/seed_45/validation_3000.csv": {
+      "n_docs": 3000.0,
+      "mean_len": 145.85933333333332,
+      "med_len": 113.0,
+      "vocab_size": 18215.0,
+      "ttr": 0.04162686423906138,
+      "top100_mass": 0.5356347896832108,
+      "total_tokens": 437578.0
+    },
+    "yelp/seed_45/within_2011_2012_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 141.5675,
+      "med_len": 110.0,
+      "vocab_size": 14002.0,
+      "ttr": 0.049453440938068416,
+      "top100_mass": 0.5361400038850725,
+      "total_tokens": 283135.0
+    },
+    "yelp/seed_45/within_2011_2012_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 142.988,
+      "med_len": 111.0,
+      "vocab_size": 9913.0,
+      "ttr": 0.0693274960136515,
+      "top100_mass": 0.5346672448037597,
+      "total_tokens": 142988.0
+    },
+    "yelp/seed_46/long_2019_2020_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 109.152,
+      "med_len": 77.0,
+      "vocab_size": 11434.0,
+      "ttr": 0.05237650249193785,
+      "top100_mass": 0.5430271547933158,
+      "total_tokens": 218304.0
+    },
+    "yelp/seed_46/long_2019_2020_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 108.903,
+      "med_len": 75.5,
+      "vocab_size": 8161.0,
+      "ttr": 0.07493824779849959,
+      "top100_mass": 0.5423725700853053,
+      "total_tokens": 108903.0
+    },
+    "yelp/seed_46/short_2015_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 119.432,
+      "med_len": 82.0,
+      "vocab_size": 12293.0,
+      "ttr": 0.05146443164311072,
+      "top100_mass": 0.5393487507535669,
+      "total_tokens": 238864.0
+    },
+    "yelp/seed_46/short_2015_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 116.902,
+      "med_len": 82.0,
+      "vocab_size": 8550.0,
+      "ttr": 0.07313818412003216,
+      "top100_mass": 0.5388616105798019,
+      "total_tokens": 116902.0
+    },
+    "yelp/seed_46/train_7000.csv": {
+      "n_docs": 7000.0,
+      "mean_len": 147.19585714285714,
+      "med_len": 115.0,
+      "vocab_size": 27561.0,
+      "ttr": 0.02674861773089499,
+      "top100_mass": 0.5337029089522124,
+      "total_tokens": 1030371.0
+    },
+    "yelp/seed_46/validation_3000.csv": {
+      "n_docs": 3000.0,
+      "mean_len": 149.95866666666666,
+      "med_len": 117.0,
+      "vocab_size": 18642.0,
+      "ttr": 0.041438085161244434,
+      "top100_mass": 0.535620926655345,
+      "total_tokens": 449876.0
+    },
+    "yelp/seed_46/within_2011_2012_n1000_per_label_total2000.csv": {
+      "n_docs": 2000.0,
+      "mean_len": 142.0335,
+      "med_len": 108.0,
+      "vocab_size": 14164.0,
+      "ttr": 0.04986147634184893,
+      "top100_mass": 0.5372781773314043,
+      "total_tokens": 284067.0
+    },
+    "yelp/seed_46/within_2011_2012_n500_per_label_total1000.csv": {
+      "n_docs": 1000.0,
+      "mean_len": 145.288,
+      "med_len": 110.0,
+      "vocab_size": 10166.0,
+      "ttr": 0.06997136721546171,
+      "top100_mass": 0.5371469082099003,
+      "total_tokens": 145288.0
+    }
+  },
+  "forensics": {
+    "Climate n500||short||42": {
+      "lexical_novelty": 0.6408930669800235,
+      "js_divergence": 0.2923906229973234,
+      "top100_mass_change": 0.03047261525321021,
+      "mean_length_change": -0.9929999999999986,
+      "overlap_loss": 0.7936807993518769,
+      "class_marker_asymmetry": 0.005812263876780022,
+      "labels": [
+        "BELIEVER",
+        "DENIER"
+      ],
+      "churn": {
+        "BELIEVER": 0.9247311827956989,
+        "DENIER": 0.9189189189189189
+      }
+    },
+    "Climate n500||short||43": {
+      "lexical_novelty": 0.6382038157282457,
+      "js_divergence": 0.29251141856324575,
+      "top100_mass_change": 0.040590152743719465,
+      "mean_length_change": -1.2219999999999978,
+      "overlap_loss": 0.7925283522348232,
+      "class_marker_asymmetry": 0.016709368385875,
+      "labels": [
+        "BELIEVER",
+        "DENIER"
+      ],
+      "churn": {
+        "BELIEVER": 0.9528795811518325,
+        "DENIER": 0.9361702127659575
+      }
+    },
+    "Climate n500||short||44": {
+      "lexical_novelty": 0.6200578592092575,
+      "js_divergence": 0.2816709886088634,
+      "top100_mass_change": 0.03911275063938702,
+      "mean_length_change": -1.1229999999999976,
+      "overlap_loss": 0.7854614756329976,
+      "class_marker_asymmetry": 0.06399069226294363,
+      "labels": [
+        "BELIEVER",
+        "DENIER"
+      ],
+      "churn": {
+        "BELIEVER": 0.9528795811518325,
+        "DENIER": 0.8888888888888888
+      }
+    },
+    "Climate n500||short||45": {
+      "lexical_novelty": 0.6327116212338594,
+      "js_divergence": 0.2923487175144391,
+      "top100_mass_change": 0.044843575597380614,
+      "mean_length_change": -1.216000000000001,
+      "overlap_loss": 0.79279643868879,
+      "class_marker_asymmetry": 0.03899938715248763,
+      "labels": [
+        "BELIEVER",
+        "DENIER"
+      ],
+      "churn": {
+        "BELIEVER": 0.9637305699481865,
+        "DENIER": 0.9247311827956989
+      }
+    },
+    "Climate n500||short||46": {
+      "lexical_novelty": 0.6303284416491963,
+      "js_divergence": 0.28816637093303543,
+      "top100_mass_change": 0.04376779394499575,
+      "mean_length_change": -0.884999999999998,
+      "overlap_loss": 0.7888223552894211,
+      "class_marker_asymmetry": 0.018015853951477312,
+      "labels": [
+        "BELIEVER",
+        "DENIER"
+      ],
+      "churn": {
+        "BELIEVER": 0.9130434782608696,
+        "DENIER": 0.8950276243093923
+      }
+    },
+    "Climate n500||long||42": {
+      "lexical_novelty": 0.7259963768115942,
+      "js_divergence": 0.3330079095145607,
+      "top100_mass_change": -0.006841308579974892,
+      "mean_length_change": 8.411999999999999,
+      "overlap_loss": 0.8087057335581788,
+      "class_marker_asymmetry": 0.01782001782001774,
+      "labels": [
+        "BELIEVER",
+        "DENIER"
+      ],
+      "churn": {
+        "BELIEVER": 0.9189189189189189,
+        "DENIER": 0.9010989010989011
+      }
+    },
+    "Climate n500||long||43": {
+      "lexical_novelty": 0.7152187120291617,
+      "js_divergence": 0.33286340956273514,
+      "top100_mass_change": -0.005828670946873671,
+      "mean_length_change": 8.364,
+      "overlap_loss": 0.8018179896416869,
+      "class_marker_asymmetry": 0.00556947925368978,
+      "labels": [
+        "BELIEVER",
+        "DENIER"
+      ],
+      "churn": {
+        "BELIEVER": 0.9417989417989419,
+        "DENIER": 0.9473684210526316
+      }
+    },
+    "Climate n500||long||44": {
+      "lexical_novelty": 0.7083902291002883,
+      "js_divergence": 0.32780087552344334,
+      "top100_mass_change": -0.007603843840669533,
+      "mean_length_change": 7.963000000000001,
+      "overlap_loss": 0.7964629884570582,
+      "class_marker_asymmetry": 0.011562364503540978,
+      "labels": [
+        "BELIEVER",
+        "DENIER"
+      ],
+      "churn": {
+        "BELIEVER": 0.9304812834224598,
+        "DENIER": 0.9189189189189189
+      }
+    },
+    "Climate n500||long||45": {
+      "lexical_novelty": 0.7242619511464109,
+      "js_divergence": 0.3369049716770187,
+      "top100_mass_change": -0.0059085314309643144,
+      "mean_length_change": 8.114999999999998,
+      "overlap_loss": 0.8083333333333333,
+      "class_marker_asymmetry": 0.03360215053763449,
+      "labels": [
+        "BELIEVER",
+        "DENIER"
+      ],
+      "churn": {
+        "BELIEVER": 0.9247311827956989,
+        "DENIER": 0.9583333333333334
+      }
+    },
+    "Climate n500||long||46": {
+      "lexical_novelty": 0.7146341463414634,
+      "js_divergence": 0.3310459809948648,
+      "top100_mass_change": -0.005079409644002386,
+      "mean_length_change": 7.615000000000002,
+      "overlap_loss": 0.8028851216173528,
+      "class_marker_asymmetry": 0.021931628149244653,
+      "labels": [
+        "BELIEVER",
+        "DENIER"
+      ],
+      "churn": {
+        "BELIEVER": 0.9637305699481865,
+        "DENIER": 0.9417989417989419
+      }
+    },
+    "Yelp n500||short||42": {
+      "lexical_novelty": 0.38570618264322176,
+      "js_divergence": 0.058384306169203246,
+      "top100_mass_change": 0.0009559548652313676,
+      "mean_length_change": -22.69099999999999,
+      "overlap_loss": 0.5949584860498167,
+      "class_marker_asymmetry": 0.03899938715248763,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.9247311827956989,
+        "POS": 0.9637305699481865
+      }
+    },
+    "Yelp n500||short||43": {
+      "lexical_novelty": 0.37250580046403714,
+      "js_divergence": 0.05829197937974583,
+      "top100_mass_change": 0.005152318825246582,
+      "mean_length_change": -24.858999999999995,
+      "overlap_loss": 0.597664385599524,
+      "class_marker_asymmetry": 0.02727322314951175,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.9417989417989419,
+        "POS": 0.9690721649484536
+      }
+    },
+    "Yelp n500||short||44": {
+      "lexical_novelty": 0.38549750955635353,
+      "js_divergence": 0.060598353396604306,
+      "top100_mass_change": 0.001929588821747541,
+      "mean_length_change": -18.585000000000008,
+      "overlap_loss": 0.5930187955504411,
+      "class_marker_asymmetry": 0.04026459591601961,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.907103825136612,
+        "POS": 0.9473684210526316
+      }
+    },
+    "Yelp n500||short||45": {
+      "lexical_novelty": 0.3845798707294552,
+      "js_divergence": 0.058347556054282775,
+      "top100_mass_change": 0.005969808283997624,
+      "mean_length_change": -27.613,
+      "overlap_loss": 0.597432993582484,
+      "class_marker_asymmetry": 0.057851956842440155,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.8950276243093923,
+        "POS": 0.9528795811518325
+      }
+    },
+    "Yelp n500||short||46": {
+      "lexical_novelty": 0.37321637426900584,
+      "js_divergence": 0.05921629206673226,
+      "top100_mass_change": 0.0017147023699015662,
+      "mean_length_change": -28.38600000000001,
+      "overlap_loss": 0.5987871528037734,
+      "class_marker_asymmetry": 0.011198208286674172,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.9361702127659575,
+        "POS": 0.9473684210526316
+      }
+    },
+    "Yelp n500||long||42": {
+      "lexical_novelty": 0.375,
+      "js_divergence": 0.06704304230817247,
+      "top100_mass_change": 0.0026706425682300194,
+      "mean_length_change": -35.02299999999998,
+      "overlap_loss": 0.6088592046675879,
+      "class_marker_asymmetry": 0.05015324602953475,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.9189189189189189,
+        "POS": 0.9690721649484536
+      }
+    },
+    "Yelp n500||long||43": {
+      "lexical_novelty": 0.3632648005945009,
+      "js_divergence": 0.0671080984023414,
+      "top100_mass_change": 0.004837871300264696,
+      "mean_length_change": -37.331999999999994,
+      "overlap_loss": 0.6095245328877412,
+      "class_marker_asymmetry": 0.0486013608381034,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.9361702127659575,
+        "POS": 0.9847715736040609
+      }
+    },
+    "Yelp n500||long||44": {
+      "lexical_novelty": 0.37913927818429866,
+      "js_divergence": 0.0676188692011058,
+      "top100_mass_change": 0.004273177679958384,
+      "mean_length_change": -29.977000000000004,
+      "overlap_loss": 0.6078031964901285,
+      "class_marker_asymmetry": 0.028148398356133586,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.9247311827956989,
+        "POS": 0.9528795811518325
+      }
+    },
+    "Yelp n500||long||45": {
+      "lexical_novelty": 0.3735481453727988,
+      "js_divergence": 0.06837653153704755,
+      "top100_mass_change": 0.010932603874539759,
+      "mean_length_change": -37.253,
+      "overlap_loss": 0.6112833230006199,
+      "class_marker_asymmetry": 0.005812263876780022,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.9247311827956989,
+        "POS": 0.9189189189189189
+      }
+    },
+    "Yelp n500||long||46": {
+      "lexical_novelty": 0.36355838745251806,
+      "js_divergence": 0.06764699859144566,
+      "top100_mass_change": 0.005225661875404963,
+      "mean_length_change": -36.385000000000005,
+      "overlap_loss": 0.6045077286225539,
+      "class_marker_asymmetry": 0.03899938715248763,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.9247311827956989,
+        "POS": 0.9637305699481865
+      }
+    },
+    "Yelp n1000||short||42": {
+      "lexical_novelty": 0.3599412340842311,
+      "js_divergence": 0.04218951053018158,
+      "top100_mass_change": 0.004183428756257546,
+      "mean_length_change": -24.343000000000018,
+      "overlap_loss": 0.579043426915025,
+      "class_marker_asymmetry": 0.1119293078055964,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.8571428571428572,
+        "POS": 0.9690721649484536
+      }
+    },
+    "Yelp n1000||short||43": {
+      "lexical_novelty": 0.35048713464901327,
+      "js_divergence": 0.04127418828939843,
+      "top100_mass_change": 0.006022454909826003,
+      "mean_length_change": -25.477000000000004,
+      "overlap_loss": 0.5757180156657964,
+      "class_marker_asymmetry": 0.04026459591601961,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.907103825136612,
+        "POS": 0.9473684210526316
+      }
+    },
+    "Yelp n1000||short||44": {
+      "lexical_novelty": 0.36624177965413657,
+      "js_divergence": 0.04279315221584157,
+      "top100_mass_change": 0.001765989779876187,
+      "mean_length_change": -19.831000000000003,
+      "overlap_loss": 0.5784186649384316,
+      "class_marker_asymmetry": 0.07248801159808183,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.907103825136612,
+        "POS": 0.9795918367346939
+      }
+    },
+    "Yelp n1000||short||45": {
+      "lexical_novelty": 0.3601021332674409,
+      "js_divergence": 0.04195143460256572,
+      "top100_mass_change": 0.0027615134066638625,
+      "mean_length_change": -26.527,
+      "overlap_loss": 0.5771742679873735,
+      "class_marker_asymmetry": 0.0687029456387942,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.8950276243093923,
+        "POS": 0.9637305699481865
+      }
+    },
+    "Yelp n1000||short||46": {
+      "lexical_novelty": 0.3572764988204669,
+      "js_divergence": 0.04209300249516654,
+      "top100_mass_change": 0.002070573422162658,
+      "mean_length_change": -22.6015,
+      "overlap_loss": 0.5742078034059064,
+      "class_marker_asymmetry": 0.06539444741691935,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.8764044943820225,
+        "POS": 0.9417989417989419
+      }
+    },
+    "Yelp n1000||long||42": {
+      "lexical_novelty": 0.34795578171609054,
+      "js_divergence": 0.050358900294659684,
+      "top100_mass_change": 0.0019281098858574541,
+      "mean_length_change": -37.26350000000001,
+      "overlap_loss": 0.5913115204839153,
+      "class_marker_asymmetry": 0.09691027248888384,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.88268156424581,
+        "POS": 0.9795918367346939
+      }
+    },
+    "Yelp n1000||long||43": {
+      "lexical_novelty": 0.3405816317510828,
+      "js_divergence": 0.05019177646814448,
+      "top100_mass_change": 0.0032924342853292154,
+      "mean_length_change": -36.3815,
+      "overlap_loss": 0.5861992456179277,
+      "class_marker_asymmetry": 0.06797326384955249,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.9010989010989011,
+        "POS": 0.9690721649484536
+      }
+    },
+    "Yelp n1000||long||44": {
+      "lexical_novelty": 0.3529668411867365,
+      "js_divergence": 0.05073217464900572,
+      "top100_mass_change": 0.0049572209808562695,
+      "mean_length_change": -33.78450000000001,
+      "overlap_loss": 0.589196675900277,
+      "class_marker_asymmetry": 0.056028686687583984,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.9130434782608696,
+        "POS": 0.9690721649484536
+      }
+    },
+    "Yelp n1000||long||45": {
+      "lexical_novelty": 0.3630755864465682,
+      "js_divergence": 0.051457322885953616,
+      "top100_mass_change": 0.005826479071014745,
+      "mean_length_change": -34.6965,
+      "overlap_loss": 0.5967768549584731,
+      "class_marker_asymmetry": 0.04481165102926765,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.9189189189189189,
+        "POS": 0.9637305699481865
+      }
+    },
+    "Yelp n1000||long||46": {
+      "lexical_novelty": 0.3425747769809341,
+      "js_divergence": 0.0491746378881707,
+      "top100_mass_change": 0.0057489774619114975,
+      "mean_length_change": -32.8815,
+      "overlap_loss": 0.5842597201482219,
+      "class_marker_asymmetry": 0.0740445406390613,
+      "labels": [
+        "NEG",
+        "POS"
+      ],
+      "churn": {
+        "NEG": 0.8950276243093923,
+        "POS": 0.9690721649484536
+      }
+    }
+  }
+}

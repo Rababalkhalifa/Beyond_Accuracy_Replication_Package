@@ -1,0 +1,9 @@
+{
+  "audited_at_utc": "2026-08-04T22:06:09.539043+00:00",
+  "split_root": "C:\\Users\\ccsit\\Downloads\\TempMultiAgent\\temporal_reliability_rerun_v8\\shared_splits_paper_v6_joint_quota",
+  "status": "PASS",
+  "problems": [],
+  "warnings": [],
+  "indexed_files": 65,
+  "loaded_files": 65
+}

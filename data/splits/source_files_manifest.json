@@ -1,0 +1,320 @@
+[
+  {
+    "dataset": "climate",
+    "role": "historical_train",
+    "path": "C:\\Users\\ccsit\\Downloads\\TempMultiAgent\\data\\sampled_splits\\climate_final\\train_2007_2009.csv",
+    "source_file_sha256": "5bbe400c6ec0c41ca24ac653b64fdea4366a7e0654ec950d02e0d19ce722ade1",
+    "original_rows": 132195,
+    "usable_rows": 88130,
+    "empty_text_rows_removed": 0,
+    "unmapped_label_rows_removed": 44065,
+    "year_col": "year",
+    "configured_years": [
+      "2007",
+      "2008",
+      "2009"
+    ],
+    "observed_year_counts": {
+      "2007": 476,
+      "2008": 4421,
+      "2009": 83233
+    },
+    "raw_label_counts": {
+      "neutral": 44065,
+      "denier": 44065,
+      "believer": 44065
+    },
+    "configured_label_map": {
+      "BELIEVER": "BELIEVER",
+      "DENIER": "DENIER",
+      "0": "DENIER",
+      "1": "BELIEVER",
+      "CLIMATE_BELIEVER": "BELIEVER",
+      "CLIMATE_DENIER": "DENIER"
+    },
+    "duplicate_text_rows_detected": 6339,
+    "duplicate_id_rows_detected": 6339,
+    "label_counts": {
+      "BELIEVER": 44065,
+      "DENIER": 44065
+    }
+  },
+  {
+    "dataset": "climate",
+    "role": "within",
+    "path": "C:\\Users\\ccsit\\Downloads\\TempMultiAgent\\data\\sampled_splits\\climate_final\\within_2010.csv",
+    "source_file_sha256": "b68ffc4ed2d653a28b02681a4387c3f4719e21bec1bf3c17f761fcff962d0ba3",
+    "original_rows": 132195,
+    "usable_rows": 88130,
+    "empty_text_rows_removed": 0,
+    "unmapped_label_rows_removed": 44065,
+    "year_col": "year",
+    "configured_years": [
+      "2010"
+    ],
+    "observed_year_counts": {
+      "2010": 88130
+    },
+    "raw_label_counts": {
+      "neutral": 44065,
+      "denier": 44065,
+      "believer": 44065
+    },
+    "configured_label_map": {
+      "BELIEVER": "BELIEVER",
+      "DENIER": "DENIER",
+      "0": "DENIER",
+      "1": "BELIEVER",
+      "CLIMATE_BELIEVER": "BELIEVER",
+      "CLIMATE_DENIER": "DENIER"
+    },
+    "duplicate_text_rows_detected": 7843,
+    "duplicate_id_rows_detected": 7843,
+    "label_counts": {
+      "BELIEVER": 44065,
+      "DENIER": 44065
+    }
+  },
+  {
+    "dataset": "climate",
+    "role": "short",
+    "path": "C:\\Users\\ccsit\\Downloads\\TempMultiAgent\\data\\sampled_splits\\climate_final\\short_2013.csv",
+    "source_file_sha256": "0e5b55add1f2255ee09a59d4d0cab75d526cf643940943c1bfc995c2060e930b",
+    "original_rows": 132195,
+    "usable_rows": 88130,
+    "empty_text_rows_removed": 0,
+    "unmapped_label_rows_removed": 44065,
+    "year_col": "year",
+    "configured_years": [
+      "2013"
+    ],
+    "observed_year_counts": {
+      "2013": 88130
+    },
+    "raw_label_counts": {
+      "believer": 44065,
+      "neutral": 44065,
+      "denier": 44065
+    },
+    "configured_label_map": {
+      "BELIEVER": "BELIEVER",
+      "DENIER": "DENIER",
+      "0": "DENIER",
+      "1": "BELIEVER",
+      "CLIMATE_BELIEVER": "BELIEVER",
+      "CLIMATE_DENIER": "DENIER"
+    },
+    "duplicate_text_rows_detected": 3403,
+    "duplicate_id_rows_detected": 3403,
+    "label_counts": {
+      "BELIEVER": 44065,
+      "DENIER": 44065
+    }
+  },
+  {
+    "dataset": "climate",
+    "role": "long",
+    "path": "C:\\Users\\ccsit\\Downloads\\TempMultiAgent\\data\\sampled_splits\\climate_final\\long_2018_2019.csv",
+    "source_file_sha256": "95fecff87b4c51d5714fcb43ae8337136bd0bb11b9dbd21a38ce8aa37594feb6",
+    "original_rows": 132195,
+    "usable_rows": 88130,
+    "empty_text_rows_removed": 0,
+    "unmapped_label_rows_removed": 44065,
+    "year_col": "year",
+    "configured_years": [
+      "2018",
+      "2019"
+    ],
+    "observed_year_counts": {
+      "2018": 64688,
+      "2019": 23442
+    },
+    "raw_label_counts": {
+      "neutral": 44065,
+      "believer": 44065,
+      "denier": 44065
+    },
+    "configured_label_map": {
+      "BELIEVER": "BELIEVER",
+      "DENIER": "DENIER",
+      "0": "DENIER",
+      "1": "BELIEVER",
+      "CLIMATE_BELIEVER": "BELIEVER",
+      "CLIMATE_DENIER": "DENIER"
+    },
+    "duplicate_text_rows_detected": 32960,
+    "duplicate_id_rows_detected": 32960,
+    "label_counts": {
+      "BELIEVER": 44065,
+      "DENIER": 44065
+    }
+  },
+  {
+    "dataset": "yelp",
+    "role": "historical_train",
+    "path": "C:\\Users\\ccsit\\Downloads\\TempMultiAgent\\data\\sampled_splits\\yelp_final\\train_2006_2010.csv",
+    "source_file_sha256": "6fbe754ec6c1a983a96429ced257bb884521b759f8744c8d3115cd14d7b064ec",
+    "original_rows": 134994,
+    "usable_rows": 89996,
+    "empty_text_rows_removed": 0,
+    "unmapped_label_rows_removed": 44998,
+    "year_col": "year",
+    "configured_years": [
+      "2006",
+      "2007",
+      "2008",
+      "2009",
+      "2010"
+    ],
+    "observed_year_counts": {
+      "2006": 1016,
+      "2007": 4459,
+      "2008": 14281,
+      "2009": 24465,
+      "2010": 45775
+    },
+    "raw_label_counts": {
+      "positive": 44998,
+      "negative": 44998,
+      "neutral": 44998
+    },
+    "configured_label_map": {
+      "NEG": "NEG",
+      "POS": "POS",
+      "0": "NEG",
+      "1": "POS",
+      "2": null,
+      "NEU": null,
+      "NEUTRAL": null,
+      "NEGATIVE": "NEG",
+      "POSITIVE": "POS"
+    },
+    "duplicate_text_rows_detected": 89,
+    "duplicate_id_rows_detected": 89,
+    "label_counts": {
+      "NEG": 44998,
+      "POS": 44998
+    }
+  },
+  {
+    "dataset": "yelp",
+    "role": "within",
+    "path": "C:\\Users\\ccsit\\Downloads\\TempMultiAgent\\data\\sampled_splits\\yelp_final\\within_2011_2012.csv",
+    "source_file_sha256": "79d4f1abf07025bfa86ac8562dac3343f4b5f35c7e7cc375afe3c3518b9477f8",
+    "original_rows": 134994,
+    "usable_rows": 89996,
+    "empty_text_rows_removed": 0,
+    "unmapped_label_rows_removed": 44998,
+    "year_col": "year",
+    "configured_years": [
+      "2011",
+      "2012"
+    ],
+    "observed_year_counts": {
+      "2011": 39272,
+      "2012": 50724
+    },
+    "raw_label_counts": {
+      "positive": 44998,
+      "negative": 44998,
+      "neutral": 44998
+    },
+    "configured_label_map": {
+      "NEG": "NEG",
+      "POS": "POS",
+      "0": "NEG",
+      "1": "POS",
+      "2": null,
+      "NEU": null,
+      "NEUTRAL": null,
+      "NEGATIVE": "NEG",
+      "POSITIVE": "POS"
+    },
+    "duplicate_text_rows_detected": 62,
+    "duplicate_id_rows_detected": 62,
+    "label_counts": {
+      "NEG": 44998,
+      "POS": 44998
+    }
+  },
+  {
+    "dataset": "yelp",
+    "role": "short",
+    "path": "C:\\Users\\ccsit\\Downloads\\TempMultiAgent\\data\\sampled_splits\\yelp_final\\short_2015.csv",
+    "source_file_sha256": "909edad4a8a4110096db84c686dba86674d860df5502c26f3d35b08fb4f761c7",
+    "original_rows": 134994,
+    "usable_rows": 89996,
+    "empty_text_rows_removed": 0,
+    "unmapped_label_rows_removed": 44998,
+    "year_col": "year",
+    "configured_years": [
+      "2015"
+    ],
+    "observed_year_counts": {
+      "2015": 89996
+    },
+    "raw_label_counts": {
+      "neutral": 44998,
+      "negative": 44998,
+      "positive": 44998
+    },
+    "configured_label_map": {
+      "NEG": "NEG",
+      "POS": "POS",
+      "0": "NEG",
+      "1": "POS",
+      "2": null,
+      "NEU": null,
+      "NEUTRAL": null,
+      "NEGATIVE": "NEG",
+      "POSITIVE": "POS"
+    },
+    "duplicate_text_rows_detected": 75,
+    "duplicate_id_rows_detected": 75,
+    "label_counts": {
+      "NEG": 44998,
+      "POS": 44998
+    }
+  },
+  {
+    "dataset": "yelp",
+    "role": "long",
+    "path": "C:\\Users\\ccsit\\Downloads\\TempMultiAgent\\data\\sampled_splits\\yelp_final\\long_2019_2020.csv",
+    "source_file_sha256": "1ad300a000d74ee4c6613850fd29b229ad1e019135025a86502b87c427f447db",
+    "original_rows": 134994,
+    "usable_rows": 89996,
+    "empty_text_rows_removed": 0,
+    "unmapped_label_rows_removed": 44998,
+    "year_col": "year",
+    "configured_years": [
+      "2019",
+      "2020"
+    ],
+    "observed_year_counts": {
+      "2019": 55042,
+      "2020": 34954
+    },
+    "raw_label_counts": {
+      "positive": 44998,
+      "neutral": 44998,
+      "negative": 44998
+    },
+    "configured_label_map": {
+      "NEG": "NEG",
+      "POS": "POS",
+      "0": "NEG",
+      "1": "POS",
+      "2": null,
+      "NEU": null,
+      "NEUTRAL": null,
+      "NEGATIVE": "NEG",
+      "POSITIVE": "POS"
+    },
+    "duplicate_text_rows_detected": 24,
+    "duplicate_id_rows_detected": 24,
+    "label_counts": {
+      "NEG": 44998,
+      "POS": 44998
+    }
+  }
+]

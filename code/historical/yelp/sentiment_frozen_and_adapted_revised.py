@@ -1,0 +1,1373 @@
+#!/usr/bin/env python3
+"""
+Unified temporal sentiment experiment: frozen Ollama LLMs + adapted DistilBERT.
+
+Scientific split rules
+----------------------
+1. The historical training pool is split stratifiably into 70% model fitting and
+   30% internal validation. The internal validation split is used for early
+   stopping/model selection only.
+2. The paper evaluation periods are never used for training or model selection:
+      - within-period evaluation
+      - short-horizon temporal evaluation
+      - long-horizon temporal evaluation
+3. Frozen and adapted approaches use the exact same saved evaluation samples.
+4. For each seed, the 500-per-label evaluation sample is nested inside the
+   1,000-per-label sample, so sample-size comparisons are paired.
+5. The training pool is decontaminated against all evaluation periods by exact
+   normalized-text SHA-1 before the 70/30 split. Evaluation rows are not altered.
+
+Expected datasets.json entry
+----------------------------
+{
+  "yelp": {
+    "id_col": "id",
+    "text_col": "text",
+    "label_col": "label",
+    "label_map": {"0": "NEG", "1": "POS"},
+    "date_col": "date",                     # optional
+    "paths": {
+      "train": "data/yelp_train_2007_2009.csv",
+      "gold_dev": "data/yelp_within_2010.csv",
+      "gold_test_short": "data/yelp_short_2013.csv",
+      "gold_test_long": "data/yelp_long_2018_2019.csv"
+    }
+  }
+}
+
+Accepted path aliases are documented in PATH_ALIASES below.
+
+Examples
+--------
+Prepare and inspect shared splits only:
+    python sentiment_frozen_and_adapted_revised.py --mode prepare
+
+Run both model families using the newly prepared shared splits:
+    python sentiment_frozen_and_adapted_revised.py --mode both
+
+Reuse an earlier shared split directory:
+    python sentiment_frozen_and_adapted_revised.py --mode both \
+        --split-root out/sentiment_joint_YYYYMMDD_HHMMSS/shared_splits
+
+Run only the adapted model after installing transformers:
+    pip install transformers accelerate
+    python sentiment_frozen_and_adapted_revised.py --mode adapted
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import inspect
+import json
+import math
+import os
+import statistics
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Iterable, Sequence
+
+import numpy as np
+import pandas as pd
+import requests
+from sklearn.metrics import accuracy_score, f1_score
+from sklearn.model_selection import train_test_split
+
+
+# =============================================================================
+# USER SETTINGS
+# =============================================================================
+
+TASK_NAME = "sentiment"
+DEFAULT_DATASET_KEY = "yelp"
+DEFAULT_CONFIG_PATH = Path("datasets.json")
+
+LABEL_ORDER = ["NEG", "POS"]
+LABEL_SET = set(LABEL_ORDER)
+DEFAULT_INVALID_LABEL = "NEG"
+
+# Paper evaluation sizes. These are per label, so n=500 means 1,000 total rows.
+EVAL_SIZES_PER_LABEL = [500, 1000]
+SAMPLE_SEEDS = [42, 43, 44, 45, 46]
+
+# Conventional supervised split from the historical training pool.
+TRAIN_FRACTION = 0.70
+VALIDATION_FRACTION = 0.30
+
+# Optional safety cap for development. Keep None for the full historical pool.
+MAX_HISTORICAL_ROWS_PER_LABEL: int | None = None
+
+# Frozen LLM settings.
+OLLAMA_HOST = "http://localhost:11434"
+FROZEN_MODELS = ["qwen2.5:3b-instruct", "phi3.5:latest"]
+NUM_WORKERS = min(6, os.cpu_count() or 1)
+MAX_TEXT_CHARS = 800
+NUM_PREDICT = 80
+TIMEOUT_SEC = 600
+RETRIES = 2
+DECODE_SEEDS = [1]
+TEMPERATURE = 0.0
+TOP_P = 1.0
+
+PROMPT_IDS = ["p1_minimal", "p3_json_strict", "p5_abstain"]
+CANONICAL_PROMPT = "p3_json_strict"
+
+PROMPTS = {
+    "p1_minimal": """You are a sentiment classifier.
+Return ONLY valid JSON with keys: label, confidence, abstain.
+Allowed labels: POS, NEG.
+confidence MUST be a number between 0 and 1.
+Text: {text}
+""",
+    "p3_json_strict": """Classify the sentiment of TEXT into exactly one label: POS or NEG.
+Output MUST be one JSON object on one line. No markdown and no extra keys.
+confidence must be a float in [0,1].
+Use this exact shape:
+{"label":"POS","confidence":0.9,"abstain":false}
+TEXT:
+{text}
+""",
+    "p5_abstain": """You are a cautious sentiment classifier.
+Return ONLY one JSON object on one line. No markdown and no extra keys.
+Allowed labels: POS, NEG.
+Use this exact shape:
+{"label":"NEG","confidence":0.0,"abstain":true}
+If the sentiment is mixed, sarcastic, unclear, or genuinely uncertain:
+- set abstain=true
+- still provide your best-guess label
+- confidence <= 0.5
+If confident, set abstain=false and confidence closer to 1.
+TEXT:
+{text}
+""",
+}
+
+JSON_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "label": {"type": "string", "enum": LABEL_ORDER},
+        "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "abstain": {"type": "boolean"},
+    },
+    "required": ["label", "confidence", "abstain"],
+}
+
+SYSTEM_PROMPT = "Follow the user instructions exactly. Output only what is requested."
+
+# Adapted DistilBERT settings.
+ADAPTED_MODEL_NAME = "distilbert-base-uncased"
+MAX_LENGTH = 192
+NUM_EPOCHS = 3
+LEARNING_RATE = 2e-5
+WEIGHT_DECAY = 0.01
+WARMUP_RATIO = 0.1
+EARLY_STOPPING_PATIENCE = 1
+TRAIN_BATCH_SIZE = 8
+EVAL_BATCH_SIZE = 16
+
+# datasets.json path aliases. Temporal files themselves remain unchanged.
+PATH_ALIASES = {
+    "historical_train": ["train", "historical_train", "weak_pool", "gold_train", "train_pool"],
+    "within": ["gold_dev", "within", "gold_within", "within_test"],
+    "short": ["gold_test_short", "short", "short_test"],
+    "long": ["gold_test_long", "long", "long_test"],
+}
+
+STANDARD_COLUMNS = ["example_id", "text", "label", "text_sha1"]
+
+
+# =============================================================================
+# GENERIC HELPERS
+# =============================================================================
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--mode",
+        choices=["prepare", "frozen", "adapted", "both"],
+        default="both",
+        help="prepare shared data only, or run one/both model families",
+    )
+    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG_PATH)
+    parser.add_argument("--dataset", default=DEFAULT_DATASET_KEY)
+    parser.add_argument(
+        "--split-root",
+        type=Path,
+        default=None,
+        help="Reuse an existing shared_splits directory. If omitted, create one.",
+    )
+    parser.add_argument(
+        "--run-dir",
+        type=Path,
+        default=None,
+        help="Optional output directory. Default: out/sentiment_joint_<timestamp>",
+    )
+    parser.add_argument(
+        "--eval-sizes",
+        type=int,
+        nargs="+",
+        default=EVAL_SIZES_PER_LABEL,
+        help="Balanced evaluation rows per label; paper defaults are 500 and 1000.",
+    )
+    parser.add_argument(
+        "--seeds",
+        type=int,
+        nargs="+",
+        default=SAMPLE_SEEDS,
+        help="Repeated sampling/training seeds.",
+    )
+    parser.add_argument(
+        "--frozen-models",
+        nargs="+",
+        default=FROZEN_MODELS,
+        help="Ollama model tags.",
+    )
+    parser.add_argument(
+        "--overwrite-splits",
+        action="store_true",
+        help="Recreate shared split files if they already exist.",
+    )
+    return parser.parse_args()
+
+
+def write_json(path: Path, obj: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    with tmp.open("w", encoding="utf-8") as handle:
+        json.dump(obj, handle, ensure_ascii=False, indent=2)
+    tmp.replace(path)
+
+
+def write_csv(path: Path, rows: list[dict[str, Any]] | pd.DataFrame) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df = rows if isinstance(rows, pd.DataFrame) else pd.DataFrame(rows)
+    df.to_csv(path, index=False)
+
+
+def normalized_text(value: Any) -> str:
+    return " ".join(str(value).strip().split())
+
+
+def sha1_text(value: Any) -> str:
+    return hashlib.sha1(normalized_text(value).encode("utf-8")).hexdigest()
+
+
+def normalize_token(value: Any) -> str:
+    if pd.isna(value):
+        return ""
+    return str(value).strip().upper()
+
+
+def stable_offset(name: str) -> int:
+    return int(hashlib.sha1(name.encode("utf-8")).hexdigest()[:8], 16) % 100_000
+
+
+def mean_std(values: Iterable[float]) -> dict[str, Any]:
+    vals = [float(v) for v in values if v is not None and not pd.isna(v)]
+    if not vals:
+        return {"mean": None, "std": None, "n": 0}
+    return {
+        "mean": float(np.mean(vals)),
+        "std": float(np.std(vals, ddof=0)),
+        "n": len(vals),
+    }
+
+
+def resolve_path(paths: dict[str, str], role: str) -> Path:
+    for key in PATH_ALIASES[role]:
+        if key in paths:
+            path = Path(paths[key])
+            if not path.exists():
+                raise FileNotFoundError(f"Configured {role} path does not exist: {path}")
+            return path
+    raise KeyError(
+        f"Could not resolve {role!r}. Expected one of {PATH_ALIASES[role]} in paths; "
+        f"found {sorted(paths)}"
+    )
+
+
+def normalize_label_map(raw_map: dict[Any, Any]) -> dict[Any, str]:
+    if not isinstance(raw_map, dict):
+        raise TypeError("label_map must be a dictionary")
+
+    out: dict[Any, str] = {}
+    for raw_key, raw_value in raw_map.items():
+        target = normalize_token(raw_value)
+        if target not in LABEL_SET:
+            raise ValueError(f"Invalid mapped label {raw_value!r}; expected {LABEL_ORDER}")
+        for key in {raw_key, str(raw_key), str(raw_key).strip(), normalize_token(raw_key)}:
+            out[key] = target
+    return out
+
+
+def load_source_frame(path: Path, cfg: dict[str, Any], role: str) -> pd.DataFrame:
+    df = pd.read_csv(path)
+    text_col = cfg["text_col"]
+    label_col = cfg["label_col"]
+    id_col = cfg.get("id_col")
+    date_col = cfg.get("date_col")
+
+    missing = [c for c in [text_col, label_col] if c not in df.columns]
+    if missing:
+        raise KeyError(f"{path} is missing required columns {missing}; found {list(df.columns)}")
+
+    label_map = normalize_label_map(cfg["label_map"])
+    raw_label = df[label_col]
+    mapped = raw_label.map(label_map)
+    mapped = mapped.fillna(raw_label.astype(str).str.strip().map(label_map))
+    mapped = mapped.fillna(raw_label.astype(str).str.strip().str.upper().map(label_map))
+
+    out = pd.DataFrame()
+    if id_col and id_col in df.columns:
+        out["example_id"] = df[id_col].astype(str)
+    else:
+        out["example_id"] = [f"{role}_{i}" for i in range(len(df))]
+
+    out["text"] = df[text_col].astype(str)
+    out["label"] = mapped
+    out["text_sha1"] = out["text"].map(sha1_text)
+    out["source_role"] = role
+    out["source_path"] = str(path)
+
+    if date_col and date_col in df.columns:
+        out["date_value"] = df[date_col].astype(str)
+    else:
+        detected = next((c for c in ["date", "created_at", "timestamp", "year"] if c in df.columns), None)
+        if detected:
+            out["date_value"] = df[detected].astype(str)
+
+    before = len(out)
+    out = out[out["label"].isin(LABEL_SET)].copy()
+    out = out[out["text"].map(lambda x: bool(normalized_text(x)))].copy()
+    dropped = before - len(out)
+    if dropped:
+        print(f"[WARN] {role}: dropped {dropped} rows with empty text or unmapped labels")
+
+    return out.reset_index(drop=True)
+
+
+def cap_historical_pool(df: pd.DataFrame, seed: int) -> pd.DataFrame:
+    if MAX_HISTORICAL_ROWS_PER_LABEL is None:
+        return df
+    parts = []
+    for label in LABEL_ORDER:
+        group = df[df["label"] == label]
+        n = min(MAX_HISTORICAL_ROWS_PER_LABEL, len(group))
+        parts.append(group.sample(n=n, random_state=seed + stable_offset(label)))
+    return pd.concat(parts, ignore_index=True).sample(frac=1.0, random_state=seed).reset_index(drop=True)
+
+
+def balanced_order(df: pd.DataFrame, seed: int, split_name: str) -> dict[str, pd.DataFrame]:
+    ordered: dict[str, pd.DataFrame] = {}
+    for label in LABEL_ORDER:
+        group = df[df["label"] == label]
+        ordered[label] = group.sample(
+            frac=1.0,
+            random_state=seed + stable_offset(f"{split_name}:{label}"),
+        ).reset_index(drop=True)
+    return ordered
+
+
+def nested_balanced_sample(
+    ordered: dict[str, pd.DataFrame], n_per_label: int, split_name: str
+) -> pd.DataFrame:
+    shortages = {label: len(ordered[label]) for label in LABEL_ORDER if len(ordered[label]) < n_per_label}
+    if shortages:
+        raise ValueError(
+            f"{split_name} cannot supply {n_per_label} rows per label. Available: {shortages}"
+        )
+    sample = pd.concat([ordered[label].iloc[:n_per_label] for label in LABEL_ORDER], ignore_index=True)
+    return sample.sample(frac=1.0, random_state=n_per_label + stable_offset(split_name)).reset_index(drop=True)
+
+
+def standard_saved_columns(df: pd.DataFrame) -> list[str]:
+    extra = [c for c in ["date_value", "source_role", "source_path"] if c in df.columns]
+    return STANDARD_COLUMNS + extra
+
+
+def describe_frame(
+    df: pd.DataFrame,
+    stage: str,
+    split: str,
+    seed: int | None = None,
+    eval_n_per_label: int | None = None,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    chars = df["text"].astype(str).str.len()
+    words = df["text"].astype(str).str.split().str.len()
+
+    date_min: str | None = None
+    date_max: str | None = None
+    year_min: int | None = None
+    year_max: int | None = None
+    if "date_value" in df.columns:
+        parsed = pd.to_datetime(df["date_value"], errors="coerce", utc=True)
+        if parsed.notna().any():
+            date_min = parsed.min().isoformat()
+            date_max = parsed.max().isoformat()
+            year_min = int(parsed.dt.year.min())
+            year_max = int(parsed.dt.year.max())
+        else:
+            numeric_year = pd.to_numeric(df["date_value"], errors="coerce")
+            if numeric_year.notna().any():
+                year_min = int(numeric_year.min())
+                year_max = int(numeric_year.max())
+
+    overall = {
+        "stage": stage,
+        "split": split,
+        "seed": seed,
+        "eval_n_per_label": eval_n_per_label,
+        "n_rows": int(len(df)),
+        "n_unique_texts": int(df["text_sha1"].nunique()),
+        "duplicate_rows": int(len(df) - df["text_sha1"].nunique()),
+        "char_mean": float(chars.mean()) if len(df) else None,
+        "char_std": float(chars.std(ddof=0)) if len(df) else None,
+        "char_median": float(chars.median()) if len(df) else None,
+        "char_min": int(chars.min()) if len(df) else None,
+        "char_max": int(chars.max()) if len(df) else None,
+        "word_mean": float(words.mean()) if len(df) else None,
+        "word_std": float(words.std(ddof=0)) if len(df) else None,
+        "word_median": float(words.median()) if len(df) else None,
+        "date_min": date_min,
+        "date_max": date_max,
+        "year_min": year_min,
+        "year_max": year_max,
+    }
+
+    by_label: list[dict[str, Any]] = []
+    for label in LABEL_ORDER:
+        group = df[df["label"] == label]
+        gchars = group["text"].astype(str).str.len()
+        gwords = group["text"].astype(str).str.split().str.len()
+        by_label.append(
+            {
+                "stage": stage,
+                "split": split,
+                "seed": seed,
+                "eval_n_per_label": eval_n_per_label,
+                "label": label,
+                "n_rows": int(len(group)),
+                "proportion": float(len(group) / len(df)) if len(df) else None,
+                "char_mean": float(gchars.mean()) if len(group) else None,
+                "char_std": float(gchars.std(ddof=0)) if len(group) else None,
+                "word_mean": float(gwords.mean()) if len(group) else None,
+                "word_std": float(gwords.std(ddof=0)) if len(group) else None,
+            }
+        )
+    return overall, by_label
+
+
+def print_descriptive_summary(overall_df: pd.DataFrame) -> None:
+    cols = [
+        "stage",
+        "split",
+        "seed",
+        "eval_n_per_label",
+        "n_rows",
+        "n_unique_texts",
+        "duplicate_rows",
+        "char_mean",
+        "word_mean",
+        "year_min",
+        "year_max",
+    ]
+    visible = overall_df[cols].copy()
+    print("\n=== DATASET DESCRIPTIVE STATISTICS ===")
+    print(visible.to_string(index=False))
+
+
+# =============================================================================
+# SHARED SPLIT PREPARATION
+# =============================================================================
+
+
+@dataclass(frozen=True)
+class PreparedPaths:
+    split_root: Path
+    manifest_path: Path
+    overall_stats_path: Path
+    label_stats_path: Path
+
+
+def prepare_shared_splits(
+    config_path: Path,
+    dataset_key: str,
+    split_root: Path,
+    seeds: Sequence[int],
+    eval_sizes: Sequence[int],
+    overwrite: bool,
+) -> PreparedPaths:
+    if not math.isclose(TRAIN_FRACTION + VALIDATION_FRACTION, 1.0, abs_tol=1e-12):
+        raise ValueError("TRAIN_FRACTION + VALIDATION_FRACTION must equal 1.0")
+    if not eval_sizes or min(eval_sizes) <= 0:
+        raise ValueError("Evaluation sizes must be positive")
+
+    manifest_path = split_root / "split_manifest.json"
+    overall_stats_path = split_root / "dataset_descriptive_overall.csv"
+    label_stats_path = split_root / "dataset_descriptive_by_label.csv"
+
+    if manifest_path.exists() and not overwrite:
+        existing = load_manifest(manifest_path)
+        requested_seeds = {int(x) for x in seeds}
+        available_seeds = {int(x) for x in existing.get("seeds", [])}
+        requested_sizes = {int(x) for x in eval_sizes}
+        available_sizes = {int(x) for x in existing.get("evaluation_sizes_per_label", [])}
+        if existing.get("dataset") != dataset_key:
+            raise ValueError(
+                f"Existing split manifest is for dataset={existing.get('dataset')!r}, "
+                f"not requested dataset={dataset_key!r}. Use another --split-root or --overwrite-splits."
+            )
+        if not requested_seeds.issubset(available_seeds):
+            raise ValueError(
+                f"Existing split manifest lacks requested seeds {sorted(requested_seeds - available_seeds)}. "
+                "Use --overwrite-splits to rebuild it."
+            )
+        if not requested_sizes.issubset(available_sizes):
+            raise ValueError(
+                f"Existing split manifest lacks requested evaluation sizes "
+                f"{sorted(requested_sizes - available_sizes)}. Use --overwrite-splits to rebuild it."
+            )
+        print(f"[DATA] Reusing existing shared split manifest: {manifest_path}")
+        if overall_stats_path.exists():
+            print_descriptive_summary(pd.read_csv(overall_stats_path))
+        return PreparedPaths(split_root, manifest_path, overall_stats_path, label_stats_path)
+
+    with config_path.open("r", encoding="utf-8") as handle:
+        all_cfg = json.load(handle)
+    if dataset_key not in all_cfg:
+        raise KeyError(f"Dataset {dataset_key!r} is not present in {config_path}")
+    cfg = all_cfg[dataset_key]
+
+    paths_cfg = cfg["paths"]
+    source_paths = {role: resolve_path(paths_cfg, role) for role in PATH_ALIASES}
+    source_frames = {
+        role: load_source_frame(path, cfg, role)
+        for role, path in source_paths.items()
+    }
+
+    overall_rows: list[dict[str, Any]] = []
+    label_rows: list[dict[str, Any]] = []
+    for role, frame in source_frames.items():
+        overall, by_label = describe_frame(frame, stage="source", split=role)
+        overall_rows.append(overall)
+        label_rows.extend(by_label)
+
+    # Remove exact text overlap from training only; evaluation periods remain unchanged.
+    all_eval_hashes = set().union(
+        *[set(source_frames[role]["text_sha1"]) for role in ["within", "short", "long"]]
+    )
+    historical = source_frames["historical_train"]
+    overlap_rows = int(historical["text_sha1"].isin(all_eval_hashes).sum())
+    historical_clean = historical[~historical["text_sha1"].isin(all_eval_hashes)].copy()
+    if overlap_rows:
+        print(f"[DATA] Removed {overlap_rows} historical rows overlapping evaluation text")
+
+    split_root.mkdir(parents=True, exist_ok=True)
+    manifest: dict[str, Any] = {
+        "task": TASK_NAME,
+        "dataset": dataset_key,
+        "created_at": datetime.now().isoformat(),
+        "config_path": str(config_path),
+        "source_paths": {k: str(v) for k, v in source_paths.items()},
+        "labels": LABEL_ORDER,
+        "train_fraction": TRAIN_FRACTION,
+        "validation_fraction": VALIDATION_FRACTION,
+        "evaluation_sizes_per_label": sorted(set(int(x) for x in eval_sizes)),
+        "seeds": [int(s) for s in seeds],
+        "historical_overlap_rows_removed": overlap_rows,
+        "rules": {
+            "evaluation_periods_untouched_by_training": True,
+            "same_saved_evaluation_rows_for_frozen_and_adapted": True,
+            "nested_evaluation_samples": True,
+            "within_evaluation_not_used_for_early_stopping": True,
+        },
+        "seeds_manifest": {},
+    }
+
+    max_eval_n = max(eval_sizes)
+    for seed in seeds:
+        seed = int(seed)
+        seed_dir = split_root / f"seed{seed}"
+        seed_dir.mkdir(parents=True, exist_ok=True)
+
+        historical_seed = cap_historical_pool(historical_clean, seed)
+        fit_df, validation_df = train_test_split(
+            historical_seed,
+            train_size=TRAIN_FRACTION,
+            test_size=VALIDATION_FRACTION,
+            random_state=seed,
+            shuffle=True,
+            stratify=historical_seed["label"],
+        )
+        fit_df = fit_df.sample(frac=1.0, random_state=seed).reset_index(drop=True)
+        validation_df = validation_df.sample(frac=1.0, random_state=seed + 1).reset_index(drop=True)
+
+        train_path = seed_dir / "train_fit_70.csv"
+        validation_path = seed_dir / "train_validation_30.csv"
+        fit_df[standard_saved_columns(fit_df)].to_csv(train_path, index=False)
+        validation_df[standard_saved_columns(validation_df)].to_csv(validation_path, index=False)
+
+        for split_name, frame in [("train_fit_70", fit_df), ("train_validation_30", validation_df)]:
+            overall, by_label = describe_frame(frame, stage="prepared", split=split_name, seed=seed)
+            overall_rows.append(overall)
+            label_rows.extend(by_label)
+
+        eval_orders = {
+            split: balanced_order(source_frames[split], seed, split)
+            for split in ["within", "short", "long"]
+        }
+        seed_manifest: dict[str, Any] = {
+            "train_fit": str(train_path),
+            "train_validation": str(validation_path),
+            "train_fit_rows": int(len(fit_df)),
+            "train_validation_rows": int(len(validation_df)),
+            "evaluation": {},
+        }
+
+        # Validate the largest size first. Smaller sizes are prefixes of the same ordering.
+        for split in ["within", "short", "long"]:
+            nested_balanced_sample(eval_orders[split], max_eval_n, split)
+
+        for n_per_label in sorted(set(int(x) for x in eval_sizes)):
+            n_dir = seed_dir / f"n{n_per_label}_per_label"
+            n_dir.mkdir(parents=True, exist_ok=True)
+            seed_manifest["evaluation"][str(n_per_label)] = {}
+
+            for split in ["within", "short", "long"]:
+                sample = nested_balanced_sample(eval_orders[split], n_per_label, split)
+                out_path = n_dir / f"{split}.csv"
+                sample[standard_saved_columns(sample)].to_csv(out_path, index=False)
+                seed_manifest["evaluation"][str(n_per_label)][split] = str(out_path)
+
+                overall, by_label = describe_frame(
+                    sample,
+                    stage="prepared",
+                    split=split,
+                    seed=seed,
+                    eval_n_per_label=n_per_label,
+                )
+                overall_rows.append(overall)
+                label_rows.extend(by_label)
+
+        manifest["seeds_manifest"][str(seed)] = seed_manifest
+
+    write_json(manifest_path, manifest)
+    write_csv(overall_stats_path, overall_rows)
+    write_csv(label_stats_path, label_rows)
+    print_descriptive_summary(pd.DataFrame(overall_rows))
+    print(f"[DATA] Wrote shared split manifest: {manifest_path}")
+    return PreparedPaths(split_root, manifest_path, overall_stats_path, label_stats_path)
+
+
+def load_manifest(path: Path) -> dict[str, Any]:
+    with path.open("r", encoding="utf-8") as handle:
+        manifest = json.load(handle)
+    if manifest.get("task") != TASK_NAME:
+        raise ValueError(f"Expected task={TASK_NAME!r}, found {manifest.get('task')!r}")
+    return manifest
+
+
+def load_standard_csv(path: str | Path) -> pd.DataFrame:
+    df = pd.read_csv(path)
+    missing = set(STANDARD_COLUMNS) - set(df.columns)
+    if missing:
+        raise KeyError(f"{path} is missing standard columns: {sorted(missing)}")
+    bad = sorted(set(df["label"].astype(str)) - LABEL_SET)
+    if bad:
+        raise ValueError(f"{path} contains invalid labels: {bad}")
+    return df
+
+
+# =============================================================================
+# METRICS
+# =============================================================================
+
+
+def ece_from_prediction_confidence(
+    y_true: Sequence[str], y_pred: Sequence[str], confidence: Sequence[float], n_bins: int = 10
+) -> float:
+    correct = np.asarray([a == b for a, b in zip(y_true, y_pred)], dtype=float)
+    conf = np.asarray(confidence, dtype=float)
+    if len(correct) == 0:
+        return 0.0
+    bins = np.linspace(0.0, 1.0, n_bins + 1)
+    ece = 0.0
+    for i in range(n_bins):
+        lo, hi = bins[i], bins[i + 1]
+        mask = (conf >= lo) & (conf < hi) if i < n_bins - 1 else (conf >= lo) & (conf <= hi)
+        if not mask.any():
+            continue
+        ece += float(mask.mean() * abs(correct[mask].mean() - conf[mask].mean()))
+    return float(ece)
+
+
+def core_metrics(y_true: Sequence[str], y_pred: Sequence[str]) -> dict[str, float]:
+    return {
+        "accuracy": float(accuracy_score(y_true, y_pred)),
+        "macro_f1": float(f1_score(y_true, y_pred, average="macro", labels=LABEL_ORDER)),
+    }
+
+
+def aggregate_metric_rows(rows: list[dict[str, Any]]) -> pd.DataFrame:
+    if not rows:
+        return pd.DataFrame()
+    df = pd.DataFrame(rows)
+    group_cols = [
+        "approach",
+        "model",
+        "eval_n_per_label",
+        "split",
+        "prompt",
+    ]
+    metric_cols = [
+        "accuracy",
+        "macro_f1",
+        "ece",
+        "abstain_rate",
+        "coverage",
+        "risk_covered",
+        "invalid_rate",
+        "latency_mean_sec",
+        "latency_p95_sec",
+        "fit_time_sec",
+        "n_eval",
+    ]
+    records: list[dict[str, Any]] = []
+    for keys, group in df.groupby(group_cols, dropna=False):
+        rec = dict(zip(group_cols, keys))
+        rec["n_seeds"] = int(group["seed"].nunique())
+        for col in metric_cols:
+            vals = pd.to_numeric(group[col], errors="coerce").dropna()
+            rec[f"{col}_mean"] = float(vals.mean()) if len(vals) else None
+            rec[f"{col}_std"] = float(vals.std(ddof=0)) if len(vals) else None
+        records.append(rec)
+    return pd.DataFrame(records)
+
+
+def temporal_delta_rows(metric_rows: list[dict[str, Any]]) -> pd.DataFrame:
+    df = pd.DataFrame(metric_rows)
+    if df.empty:
+        return df
+    canonical = df[df["prompt"] == CANONICAL_PROMPT].copy()
+    records: list[dict[str, Any]] = []
+    keys = ["approach", "model", "seed", "eval_n_per_label"]
+    for group_key, group in canonical.groupby(keys):
+        by_split = {r["split"]: r for _, r in group.iterrows()}
+        if not {"within", "short", "long"}.issubset(by_split):
+            continue
+        base = dict(zip(keys, group_key))
+        for target in ["short", "long"]:
+            records.append(
+                {
+                    **base,
+                    "target_split": target,
+                    "delta_macro_f1_within_minus_target": float(
+                        by_split["within"]["macro_f1"] - by_split[target]["macro_f1"]
+                    ),
+                    "delta_accuracy_within_minus_target": float(
+                        by_split["within"]["accuracy"] - by_split[target]["accuracy"]
+                    ),
+                }
+            )
+    return pd.DataFrame(records)
+
+
+def aggregate_temporal_deltas(delta_df: pd.DataFrame) -> pd.DataFrame:
+    if delta_df.empty:
+        return delta_df
+    group_cols = ["approach", "model", "eval_n_per_label", "target_split"]
+    rows: list[dict[str, Any]] = []
+    for keys, group in delta_df.groupby(group_cols):
+        rec = dict(zip(group_cols, keys))
+        rec["n_seeds"] = int(group["seed"].nunique())
+        for col in ["delta_macro_f1_within_minus_target", "delta_accuracy_within_minus_target"]:
+            rec[f"{col}_mean"] = float(group[col].mean())
+            rec[f"{col}_std"] = float(group[col].std(ddof=0))
+        rows.append(rec)
+    return pd.DataFrame(rows)
+
+
+def print_measure_summary(aggregate_df: pd.DataFrame) -> None:
+    if aggregate_df.empty:
+        return
+    canonical = aggregate_df[aggregate_df["prompt"] == CANONICAL_PROMPT].copy()
+    cols = [
+        "approach",
+        "model",
+        "eval_n_per_label",
+        "split",
+        "macro_f1_mean",
+        "macro_f1_std",
+        "accuracy_mean",
+        "accuracy_std",
+        "ece_mean",
+        "latency_mean_sec_mean",
+    ]
+    print("\n=== CANONICAL PERFORMANCE MEASURES ===")
+    print(canonical[cols].sort_values(cols[:4]).to_string(index=False))
+
+
+# =============================================================================
+# FROZEN OLLAMA MODELS
+# =============================================================================
+
+
+_thread_local = threading.local()
+
+
+def get_http_session() -> requests.Session:
+    if not hasattr(_thread_local, "session"):
+        _thread_local.session = requests.Session()
+    return _thread_local.session
+
+
+def make_prompt(prompt_id: str, text: str) -> str:
+    clean = str(text)
+    if len(clean) > MAX_TEXT_CHARS:
+        clean = clean[:MAX_TEXT_CHARS] + " ...[TRUNCATED]"
+    return PROMPTS[prompt_id].replace("{text}", clean)
+
+
+def warmup_ollama_model(model: str) -> None:
+    payload = {
+        "model": model,
+        "messages": [
+            {
+                "role": "system",
+                "content": 'Output ONLY this JSON: {"label":"POS","confidence":1.0,"abstain":false}',
+            },
+            {"role": "user", "content": "OK"},
+        ],
+        "options": {"temperature": 0.0, "top_p": 1.0, "seed": 1, "num_predict": 20},
+        "format": JSON_SCHEMA,
+        "stream": False,
+    }
+    try:
+        requests.post(f"{OLLAMA_HOST}/api/chat", json=payload, timeout=(10, 120)).raise_for_status()
+    except Exception as exc:
+        print(f"[WARN] Ollama warm-up failed for {model}: {exc}")
+
+
+def ollama_chat(model: str, prompt: str, decode_seed: int) -> tuple[str, float, str | None]:
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt},
+        ],
+        "options": {
+            "temperature": TEMPERATURE,
+            "top_p": TOP_P,
+            "seed": decode_seed,
+            "num_predict": NUM_PREDICT,
+        },
+        "format": JSON_SCHEMA,
+        "stream": False,
+    }
+    last_error: Exception | None = None
+    for attempt in range(RETRIES + 1):
+        try:
+            t0 = time.perf_counter()
+            response = get_http_session().post(
+                f"{OLLAMA_HOST}/api/chat",
+                json=payload,
+                timeout=(10, TIMEOUT_SEC),
+            )
+            latency = time.perf_counter() - t0
+            response.raise_for_status()
+            content = response.json().get("message", {}).get("content", "")
+            return str(content), float(latency), None
+        except Exception as exc:
+            last_error = exc
+            if attempt < RETRIES:
+                time.sleep(2.0 * (attempt + 1))
+    return "", 0.0, repr(last_error)
+
+
+def parse_frozen_json(raw: str) -> tuple[dict[str, Any] | None, str]:
+    try:
+        obj = json.loads(raw.strip())
+    except Exception:
+        return None, "json_error"
+    if not isinstance(obj, dict) or set(obj) != {"label", "confidence", "abstain"}:
+        return None, "schema_error"
+    if obj["label"] not in LABEL_SET:
+        return None, "schema_error"
+    if not isinstance(obj["confidence"], (int, float)) or not 0.0 <= float(obj["confidence"]) <= 1.0:
+        return None, "schema_error"
+    if not isinstance(obj["abstain"], bool):
+        return None, "schema_error"
+    return obj, "ok"
+
+
+def evaluate_frozen_split(
+    model: str,
+    df: pd.DataFrame,
+    prompt_id: str,
+    prediction_path: Path,
+) -> dict[str, Any]:
+    jobs: list[tuple[Any, int, int]] = []
+    rows: list[dict[str, Any]] = []
+
+    with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
+        for decode_seed in DECODE_SEEDS:
+            for idx, row in df.iterrows():
+                future = executor.submit(
+                    ollama_chat,
+                    model,
+                    make_prompt(prompt_id, row["text"]),
+                    int(decode_seed),
+                )
+                jobs.append((future, int(idx), int(decode_seed)))
+
+        for future, idx, decode_seed in jobs:
+            raw, latency, request_error = future.result()
+            parsed, status = parse_frozen_json(raw) if request_error is None else (None, "request_error")
+            source = df.iloc[idx]
+            pred = DEFAULT_INVALID_LABEL
+            confidence = 0.0
+            abstain = False
+            if parsed is not None:
+                pred = parsed["label"]
+                confidence = float(parsed["confidence"])
+                abstain = bool(parsed["abstain"])
+            rows.append(
+                {
+                    "example_id": source["example_id"],
+                    "text_sha1": source["text_sha1"],
+                    "gold_label": source["label"],
+                    "pred_label": pred,
+                    "confidence": confidence,
+                    "abstain": abstain,
+                    "status": status,
+                    "request_error": request_error,
+                    "latency_sec": latency,
+                    "decode_seed": decode_seed,
+                    "raw_output": raw,
+                }
+            )
+
+    pred_df = pd.DataFrame(rows)
+    pred_df.to_csv(prediction_path, index=False)
+    y_true = pred_df["gold_label"].tolist()
+    y_pred = pred_df["pred_label"].tolist()
+    metrics = core_metrics(y_true, y_pred)
+    correct = pred_df["gold_label"] == pred_df["pred_label"]
+    covered = ~pred_df["abstain"].astype(bool)
+    risk_covered = float(1.0 - correct[covered].mean()) if covered.any() else None
+
+    return {
+        **metrics,
+        "ece": ece_from_prediction_confidence(y_true, y_pred, pred_df["confidence"].tolist()),
+        "abstain_rate": float(pred_df["abstain"].mean()),
+        "coverage": float(covered.mean()),
+        "risk_covered": risk_covered,
+        "invalid_rate": float((pred_df["status"] != "ok").mean()),
+        "latency_mean_sec": float(pred_df["latency_sec"].mean()),
+        "latency_p95_sec": float(pred_df["latency_sec"].quantile(0.95)),
+        "fit_time_sec": None,
+        "n_eval": int(len(pred_df)),
+        "prediction_path": str(prediction_path),
+    }
+
+
+def run_frozen_models(
+    manifest: dict[str, Any],
+    run_dir: Path,
+    models: Sequence[str],
+) -> list[dict[str, Any]]:
+    metric_rows: list[dict[str, Any]] = []
+    prediction_root = run_dir / "predictions" / "frozen"
+
+    for model in models:
+        print(f"\n[FROZEN MODEL] {model}")
+        warmup_ollama_model(model)
+        safe_model = model.replace(":", "_").replace("/", "_")
+
+        for seed_str, seed_plan in manifest["seeds_manifest"].items():
+            seed = int(seed_str)
+            for n_str, eval_plan in seed_plan["evaluation"].items():
+                n_per_label = int(n_str)
+                for split in ["within", "short", "long"]:
+                    df = load_standard_csv(eval_plan[split])
+                    prompt_list = PROMPT_IDS if split == "within" else [CANONICAL_PROMPT]
+                    for prompt_id in prompt_list:
+                        print(
+                            f"  [RUN] seed={seed} n={n_per_label} split={split} prompt={prompt_id}"
+                        )
+                        pred_path = (
+                            prediction_root
+                            / safe_model
+                            / f"seed{seed}"
+                            / f"n{n_per_label}_{split}_{prompt_id}.csv"
+                        )
+                        pred_path.parent.mkdir(parents=True, exist_ok=True)
+                        measures = evaluate_frozen_split(model, df, prompt_id, pred_path)
+                        metric_rows.append(
+                            {
+                                "approach": "frozen",
+                                "model": model,
+                                "seed": seed,
+                                "eval_n_per_label": n_per_label,
+                                "split": split,
+                                "prompt": prompt_id,
+                                **measures,
+                            }
+                        )
+                        write_csv(run_dir / "metrics_frozen_partial.csv", metric_rows)
+    return metric_rows
+
+
+# =============================================================================
+# ADAPTED DISTILBERT
+# =============================================================================
+
+
+def require_adapted_dependencies() -> dict[str, Any]:
+    try:
+        import torch
+        from transformers import (
+            AutoModelForSequenceClassification,
+            AutoTokenizer,
+            DataCollatorWithPadding,
+            EarlyStoppingCallback,
+            Trainer,
+            TrainingArguments,
+            set_seed,
+        )
+    except ImportError as exc:
+        raise RuntimeError(
+            "Adapted mode requires transformers and accelerate. Install with: "
+            "pip install transformers accelerate"
+        ) from exc
+    return locals()
+
+
+def ece_binary(y_true_int: Sequence[int], prob_pos: Sequence[float], n_bins: int = 10) -> float:
+    p = np.asarray(prob_pos, dtype=float)
+    y = np.asarray(y_true_int, dtype=int)
+    pred = (p >= 0.5).astype(int)
+    confidence = np.where(pred == 1, p, 1.0 - p)
+    labels = [LABEL_ORDER[i] for i in y]
+    predictions = [LABEL_ORDER[i] for i in pred]
+    return ece_from_prediction_confidence(labels, predictions, confidence, n_bins=n_bins)
+
+
+def run_adapted_model(
+    manifest: dict[str, Any],
+    run_dir: Path,
+) -> list[dict[str, Any]]:
+    deps = require_adapted_dependencies()
+    torch = deps["torch"]
+    AutoModelForSequenceClassification = deps["AutoModelForSequenceClassification"]
+    AutoTokenizer = deps["AutoTokenizer"]
+    DataCollatorWithPadding = deps["DataCollatorWithPadding"]
+    EarlyStoppingCallback = deps["EarlyStoppingCallback"]
+    Trainer = deps["Trainer"]
+    TrainingArguments = deps["TrainingArguments"]
+    set_seed = deps["set_seed"]
+
+    label_to_int = {label: i for i, label in enumerate(LABEL_ORDER)}
+    int_to_label = {i: label for label, i in label_to_int.items()}
+
+    class TextDataset(torch.utils.data.Dataset):
+        def __init__(self, texts: Sequence[str], labels: Sequence[str], tokenizer: Any):
+            self.encodings = tokenizer(
+                list(texts),
+                truncation=True,
+                max_length=MAX_LENGTH,
+                padding=False,
+            )
+            self.labels = [label_to_int[x] for x in labels]
+
+        def __len__(self) -> int:
+            return len(self.labels)
+
+        def __getitem__(self, idx: int) -> dict[str, Any]:
+            item = {k: self.encodings[k][idx] for k in self.encodings}
+            item["labels"] = self.labels[idx]
+            return item
+
+    def compute_metrics_eval(eval_pred: Any) -> dict[str, float]:
+        logits, labels = eval_pred
+        pred = np.asarray(logits).argmax(axis=1)
+        y_true = [int_to_label[int(x)] for x in labels]
+        y_pred = [int_to_label[int(x)] for x in pred]
+        return core_metrics(y_true, y_pred)
+
+    metric_rows: list[dict[str, Any]] = []
+    prediction_root = run_dir / "predictions" / "adapted_distilbert"
+    checkpoint_root = run_dir / "checkpoints" / "adapted_distilbert"
+
+    for seed_str, seed_plan in manifest["seeds_manifest"].items():
+        seed = int(seed_str)
+        print(f"\n[ADAPTED MODEL] seed={seed}")
+        set_seed(seed)
+
+        fit_df = load_standard_csv(seed_plan["train_fit"])
+        validation_df = load_standard_csv(seed_plan["train_validation"])
+
+        tokenizer = AutoTokenizer.from_pretrained(ADAPTED_MODEL_NAME)
+        model = AutoModelForSequenceClassification.from_pretrained(
+            ADAPTED_MODEL_NAME,
+            num_labels=len(LABEL_ORDER),
+            id2label=int_to_label,
+            label2id=label_to_int,
+        )
+        train_ds = TextDataset(fit_df["text"], fit_df["label"], tokenizer)
+        validation_ds = TextDataset(validation_df["text"], validation_df["label"], tokenizer)
+        collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
+        output_dir = checkpoint_root / f"seed{seed}"
+        kwargs: dict[str, Any] = {
+            "output_dir": str(output_dir),
+            "overwrite_output_dir": True,
+            "num_train_epochs": NUM_EPOCHS,
+            "learning_rate": LEARNING_RATE,
+            "weight_decay": WEIGHT_DECAY,
+            "warmup_ratio": WARMUP_RATIO,
+            "per_device_train_batch_size": TRAIN_BATCH_SIZE,
+            "per_device_eval_batch_size": EVAL_BATCH_SIZE,
+            "save_strategy": "epoch",
+            "load_best_model_at_end": True,
+            "metric_for_best_model": "macro_f1",
+            "greater_is_better": True,
+            "logging_strategy": "epoch",
+            "save_total_limit": 1,
+            "report_to": "none",
+            "seed": seed,
+            "data_seed": seed,
+            "fp16": bool(torch.cuda.is_available()),
+        }
+        parameters = inspect.signature(TrainingArguments.__init__).parameters
+        if "eval_strategy" in parameters:
+            kwargs["eval_strategy"] = "epoch"
+        else:
+            kwargs["evaluation_strategy"] = "epoch"
+        training_args = TrainingArguments(**kwargs)
+
+        trainer_kwargs: dict[str, Any] = {
+            "model": model,
+            "args": training_args,
+            "train_dataset": train_ds,
+            "eval_dataset": validation_ds,
+            "data_collator": collator,
+            "compute_metrics": compute_metrics_eval,
+            "callbacks": [EarlyStoppingCallback(early_stopping_patience=EARLY_STOPPING_PATIENCE)],
+        }
+        trainer_params = inspect.signature(Trainer.__init__).parameters
+        if "processing_class" in trainer_params:
+            trainer_kwargs["processing_class"] = tokenizer
+        elif "tokenizer" in trainer_params:
+            trainer_kwargs["tokenizer"] = tokenizer
+        trainer = Trainer(**trainer_kwargs)
+
+        fit_start = time.perf_counter()
+        trainer.train()
+        fit_time = float(time.perf_counter() - fit_start)
+
+        # Internal validation is reported as training diagnostics only.
+        val_output = trainer.predict(validation_ds)
+        val_logits = np.asarray(val_output.predictions)
+        val_probs = torch.softmax(torch.tensor(val_logits), dim=-1).cpu().numpy()
+        val_pred = val_probs.argmax(axis=1)
+        val_true = [label_to_int[x] for x in validation_df["label"]]
+        val_metrics = core_metrics(
+            validation_df["label"].tolist(),
+            [int_to_label[int(x)] for x in val_pred],
+        )
+        write_json(
+            run_dir / f"adapted_training_diagnostics_seed{seed}.json",
+            {
+                "seed": seed,
+                "fit_rows": int(len(fit_df)),
+                "validation_rows": int(len(validation_df)),
+                "train_fraction": TRAIN_FRACTION,
+                "validation_fraction": VALIDATION_FRACTION,
+                "fit_time_sec": fit_time,
+                "validation_accuracy": val_metrics["accuracy"],
+                "validation_macro_f1": val_metrics["macro_f1"],
+                "validation_ece": ece_binary(val_true, val_probs[:, label_to_int["POS"]]),
+            },
+        )
+
+        for n_str, eval_plan in seed_plan["evaluation"].items():
+            n_per_label = int(n_str)
+            for split in ["within", "short", "long"]:
+                eval_df = load_standard_csv(eval_plan[split])
+                eval_ds = TextDataset(eval_df["text"], eval_df["label"], tokenizer)
+                t0 = time.perf_counter()
+                output = trainer.predict(eval_ds)
+                elapsed = float(time.perf_counter() - t0)
+                logits = np.asarray(output.predictions)
+                probs = torch.softmax(torch.tensor(logits), dim=-1).cpu().numpy()
+                pred_int = probs.argmax(axis=1)
+                pred_labels = [int_to_label[int(x)] for x in pred_int]
+                confidence = probs.max(axis=1)
+                prob_pos = probs[:, label_to_int["POS"]]
+                y_true = eval_df["label"].tolist()
+                y_true_int = [label_to_int[x] for x in y_true]
+                measures = core_metrics(y_true, pred_labels)
+
+                pred_df = pd.DataFrame(
+                    {
+                        "example_id": eval_df["example_id"],
+                        "text_sha1": eval_df["text_sha1"],
+                        "gold_label": y_true,
+                        "pred_label": pred_labels,
+                        "confidence": confidence,
+                        "prob_pos": prob_pos,
+                    }
+                )
+                pred_path = prediction_root / f"seed{seed}" / f"n{n_per_label}_{split}.csv"
+                pred_path.parent.mkdir(parents=True, exist_ok=True)
+                pred_df.to_csv(pred_path, index=False)
+
+                metric_rows.append(
+                    {
+                        "approach": "adapted_supervised",
+                        "model": "distilbert",
+                        "seed": seed,
+                        "eval_n_per_label": n_per_label,
+                        "split": split,
+                        "prompt": CANONICAL_PROMPT,
+                        **measures,
+                        "ece": ece_binary(y_true_int, prob_pos),
+                        "abstain_rate": 0.0,
+                        "coverage": 1.0,
+                        "risk_covered": float(1.0 - np.mean(np.asarray(y_true) == np.asarray(pred_labels))),
+                        "invalid_rate": 0.0,
+                        "latency_mean_sec": elapsed / max(len(eval_df), 1),
+                        "latency_p95_sec": None,
+                        "fit_time_sec": fit_time,
+                        "n_eval": int(len(eval_df)),
+                        "prediction_path": str(pred_path),
+                    }
+                )
+                write_csv(run_dir / "metrics_adapted_partial.csv", metric_rows)
+
+        del trainer, model, tokenizer, train_ds, validation_ds
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+    return metric_rows
+
+
+# =============================================================================
+# RESULT ASSEMBLY
+# =============================================================================
+
+
+def prompt_sensitivity_rows(metric_rows: list[dict[str, Any]]) -> pd.DataFrame:
+    df = pd.DataFrame(metric_rows)
+    if df.empty:
+        return df
+    frozen_within = df[(df["approach"] == "frozen") & (df["split"] == "within")]
+    rows: list[dict[str, Any]] = []
+    for keys, group in frozen_within.groupby(["model", "seed", "eval_n_per_label"]):
+        f1s = group.set_index("prompt")["macro_f1"].to_dict()
+        if not set(PROMPT_IDS).issubset(f1s):
+            continue
+        values = [float(f1s[p]) for p in PROMPT_IDS]
+        rows.append(
+            {
+                "model": keys[0],
+                "seed": keys[1],
+                "eval_n_per_label": keys[2],
+                "prompt_f1_mean": float(statistics.mean(values)),
+                "prompt_f1_variance": float(np.var(values)),
+                "prompt_f1_range": float(max(values) - min(values)),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def save_results(run_dir: Path, metric_rows: list[dict[str, Any]], manifest: dict[str, Any]) -> None:
+    metrics_df = pd.DataFrame(metric_rows)
+    metrics_path = run_dir / "metrics_per_seed.csv"
+    metrics_df.to_csv(metrics_path, index=False)
+
+    aggregate_df = aggregate_metric_rows(metric_rows)
+    aggregate_df.to_csv(run_dir / "metrics_aggregated.csv", index=False)
+
+    deltas = temporal_delta_rows(metric_rows)
+    deltas.to_csv(run_dir / "temporal_deltas_per_seed.csv", index=False)
+    aggregate_temporal_deltas(deltas).to_csv(run_dir / "temporal_deltas_aggregated.csv", index=False)
+
+    sensitivity = prompt_sensitivity_rows(metric_rows)
+    sensitivity.to_csv(run_dir / "prompt_sensitivity_per_seed.csv", index=False)
+
+    result_json = {
+        "task": TASK_NAME,
+        "dataset": manifest["dataset"],
+        "created_at": datetime.now().isoformat(),
+        "split_manifest": manifest,
+        "metrics_per_seed": metric_rows,
+        "metrics_aggregated": aggregate_df.replace({np.nan: None}).to_dict(orient="records"),
+        "temporal_deltas_per_seed": deltas.replace({np.nan: None}).to_dict(orient="records"),
+        "prompt_sensitivity_per_seed": sensitivity.replace({np.nan: None}).to_dict(orient="records"),
+    }
+    write_json(run_dir / "results_sentiment_combined.json", result_json)
+    print_measure_summary(aggregate_df)
+    print(f"\n[RESULTS] Wrote {metrics_path}")
+    print(f"[RESULTS] Wrote {run_dir / 'metrics_aggregated.csv'}")
+    print(f"[RESULTS] Wrote {run_dir / 'temporal_deltas_aggregated.csv'}")
+    print(f"[RESULTS] Wrote {run_dir / 'results_sentiment_combined.json'}")
+
+
+def main() -> None:
+    args = parse_args()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_dir = args.run_dir or Path("out") / f"sentiment_joint_{timestamp}"
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    split_root = args.split_root or run_dir / "shared_splits"
+    prepared = prepare_shared_splits(
+        config_path=args.config,
+        dataset_key=args.dataset,
+        split_root=split_root,
+        seeds=args.seeds,
+        eval_sizes=args.eval_sizes,
+        overwrite=args.overwrite_splits,
+    )
+    manifest = load_manifest(prepared.manifest_path)
+
+    write_json(
+        run_dir / "run_settings.json",
+        {
+            "task": TASK_NAME,
+            "mode": args.mode,
+            "dataset": args.dataset,
+            "config": str(args.config),
+            "split_root": str(split_root),
+            "eval_sizes_per_label": args.eval_sizes,
+            "seeds": args.seeds,
+            "train_fraction": TRAIN_FRACTION,
+            "validation_fraction": VALIDATION_FRACTION,
+            "frozen_models": args.frozen_models,
+            "adapted_model": ADAPTED_MODEL_NAME,
+            "canonical_prompt": CANONICAL_PROMPT,
+        },
+    )
+
+    if args.mode == "prepare":
+        print("\nDone. Shared sentiment splits and descriptive statistics are ready.")
+        return
+
+    metric_rows: list[dict[str, Any]] = []
+    if args.mode in {"frozen", "both"}:
+        metric_rows.extend(run_frozen_models(manifest, run_dir, args.frozen_models))
+    if args.mode in {"adapted", "both"}:
+        metric_rows.extend(run_adapted_model(manifest, run_dir))
+
+    save_results(run_dir, metric_rows, manifest)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,28 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{\textbf{Descriptive language statistics of the sampled temporal splits.} Values are computed from the authoritative training (7,000 examples) and evaluation (1,000 or 2,000 examples) split CSVs under lowercase word tokenization (\texttt{\textbackslash b\textbackslash w+\textbackslash b}) and reported as mean $\pm$ sample standard deviation across seeds 42--46.}
+\label{tab:sample_language_descriptors}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrr}
+\toprule
+\textbf{Dataset setting} & \textbf{Split} & \textbf{Mean tokens/doc} & \textbf{Median tokens/doc} & \textbf{Vocabulary size} & \textbf{Type-token ratio} & \textbf{Top-100 token mass} \\
+\midrule
+\textbf{Climate n500} & train & 19.00 $\pm$ 0.04 & 20.00 $\pm$ 0.00 & 18153.6 $\pm$ 62.5 & 0.136 $\pm$ 0.001 & 0.509 $\pm$ 0.001 \\
+ & within & 18.47 $\pm$ 0.11 & 19.40 $\pm$ 0.55 & 4756.2 $\pm$ 48.0 & 0.257 $\pm$ 0.003 & 0.504 $\pm$ 0.002 \\
+ & short & 17.39 $\pm$ 0.11 & 18.00 $\pm$ 0.00 & 4235.2 $\pm$ 67.3 & 0.244 $\pm$ 0.004 & 0.543 $\pm$ 0.004 \\
+ & long & 26.57 $\pm$ 0.36 & 22.80 $\pm$ 0.45 & 6606.4 $\pm$ 43.7 & 0.249 $\pm$ 0.003 & 0.497 $\pm$ 0.002 \\
+\midrule
+\textbf{Yelp n500} & train & 147.13 $\pm$ 1.97 & 114.80 $\pm$ 1.92 & 27755.6 $\pm$ 193.8 & 0.027 $\pm$ 0.000 & 0.534 $\pm$ 0.001 \\
+ & within & 142.11 $\pm$ 3.62 & 108.00 $\pm$ 3.16 & 9997.6 $\pm$ 209.9 & 0.070 $\pm$ 0.001 & 0.537 $\pm$ 0.001 \\
+ & short & 117.69 $\pm$ 1.72 & 83.60 $\pm$ 1.67 & 8656.4 $\pm$ 98.0 & 0.074 $\pm$ 0.001 & 0.540 $\pm$ 0.001 \\
+ & long & 106.92 $\pm$ 1.30 & 73.80 $\pm$ 1.52 & 8091.4 $\pm$ 64.7 & 0.076 $\pm$ 0.001 & 0.542 $\pm$ 0.002 \\
+\midrule
+\textbf{Yelp n1000} & train & 147.13 $\pm$ 1.97 & 114.80 $\pm$ 1.92 & 27755.6 $\pm$ 193.8 & 0.027 $\pm$ 0.000 & 0.534 $\pm$ 0.001 \\
+ & within & 141.30 $\pm$ 1.45 & 107.40 $\pm$ 2.19 & 14113.0 $\pm$ 102.1 & 0.050 $\pm$ 0.000 & 0.537 $\pm$ 0.001 \\
+ & short & 117.55 $\pm$ 1.78 & 82.80 $\pm$ 1.30 & 12202.4 $\pm$ 127.5 & 0.052 $\pm$ 0.001 & 0.541 $\pm$ 0.002 \\
+ & long & 106.30 $\pm$ 1.79 & 74.80 $\pm$ 1.92 & 11423.0 $\pm$ 73.8 & 0.054 $\pm$ 0.001 & 0.542 $\pm$ 0.001 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
